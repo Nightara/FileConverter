@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+fx:controller="de.dkfz.sbst.tichawa.util.converter.FileConverterController" fx:id="rootPane">
+  <top>
+    <MenuBar>
+      <Menu text="Configuration" fx:id="configMenu">
+        <MenuItem text="Load Configuration" fx:id="loadConfig" onAction="#loadConfig" />
+        <MenuItem text="Current Configuration: -/-" fx:id="configLabel" disable="true" />
+      </Menu>
+    </MenuBar>
+  </top>
+  <center>
+    <Pane fx:id="dropArea" id="dropArea" prefHeight="210" prefWidth="400" />
+  </center>
+  <bottom>
+    <Label text="No configuration loaded." fx:id="statusLabel" />
+  </bottom>
+</BorderPane>

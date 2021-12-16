@@ -1,0 +1,26 @@
+.dashed-border
+{
+  -fx-border-width: 3px;
+  -fx-border-insets: 5px;
+  -fx-border-color: GRAY;
+  -fx-border-style: dashed;
+  -fx-border-radius: 5px;
+}
+.ready
+{
+  -fx-border-color: DARKGREEN;
+}
+.working
+{
+  -fx-border-color: DARKORANGE;
+}
+.highlight
+{
+  -fx-border-color: DARKRED !important;
+}
+.blocked
+{
+  /*
+  Show that content is declined.
+  */
+}
