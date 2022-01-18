@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.dkfz.sbst.tichawa.util.converter.SettingsController">
+  <TitledPane fx:id="rootPane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+              text="Input Options" VBox.vgrow="ALWAYS">
+    <GridPane hgap="3.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vgap="3.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="50.0" />
+      </columnConstraints>
+      <Label text="Field Separator:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+      <ComboBox fx:id="fieldSeparatorBox" maxWidth="1.7976931348623157E308"
+                promptText="Semicolon (Default)" GridPane.columnIndex="2"
+                GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
+      <Label text="Config File:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+      <TextField fx:id="selectConfigField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Button mnemonicParsing="false" onAction="#selectConfigFile"
+              text="Choose file..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <Label text="Template File:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+      <TextField fx:id="selectTemplateField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Button mnemonicParsing="false" onAction="#selectTemplateFile"
+              text="Choose file..." GridPane.columnIndex="2" GridPane.rowIndex="3" />
+    </GridPane>
+  </TitledPane>
+  <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+              text="Output Options" VBox.vgrow="ALWAYS">
+    <GridPane hgap="3.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vgap="3.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="50.0" />
+      </columnConstraints>
+      <Label text="Field Separator:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+      <ComboBox fx:id="outFieldSeparatorBox" maxWidth="1.7976931348623157E308"
+                promptText="Tab (Default)" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS"
+                GridPane.rowIndex="0" />
+      <Label text="Output Directory:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+      <TextField fx:id="selectOutputField" disable="true" text="None (Use original directory)"
+                 GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Button mnemonicParsing="false" onAction="#selectOutputDir" disable="true"
+              text="Choose directory..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
+    </GridPane>
+  </TitledPane>
+  <Button mnemonicParsing="false" text="Save Options" VBox.vgrow="NEVER" onAction="#saveOptions" />
+</VBox>

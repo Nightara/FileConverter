@@ -87,7 +87,7 @@ public class Configuration
     {
       return fromFile(new FileInputStream(f));
     }
-    catch(IOException ex)
+    catch(NullPointerException | IOException ex)
     {
       return Optional.empty();
     }

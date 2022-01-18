@@ -4,6 +4,7 @@ import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import javafx.event.*;
 import javafx.fxml.*;
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -22,7 +23,8 @@ import java.util.stream.*;
 @Getter(AccessLevel.PRIVATE)
 public class FileConverterController implements Initializable
 {
-  private final Parser<String, String> parser = new SimpleStringParser(";", "\t");
+  @Setter(AccessLevel.PRIVATE)
+  private Parser<String, String> parser = new SimpleStringParser(";", "\t");
 
   @FXML
   private BorderPane rootPane;
@@ -76,52 +78,26 @@ public class FileConverterController implements Initializable
 
     dropArea.setOnDragDropped(dragEvent ->
     {
+      boolean success = false;
       Dragboard db = dragEvent.getDragboard();
-      AtomicBoolean success = new AtomicBoolean(false);
       if(db.hasFiles() && getParser().isReady())
       {
         dropArea.getStyleClass().add("working");
-        success.set(true);
         Map<Path, List<String>> parsed = db.getFiles().stream()
             .filter(File::isFile)
             .filter(File::canRead)
             .map(File::toPath)
-            .collect(Collectors.toMap(Function.identity(), path ->
-            {
-              try
-              {
-                return Stream.concat(Stream.of(getParser().encodeHeader()), Files.lines(path)
-                    .skip(1)
-                    .map(getParser()::translate))
-                    .collect(Collectors.toList());
-              }
-              catch(IOException ex)
-              {
-                success.set(false);
-                return Collections.emptyList();
-              }
-            }));
+            .collect(Collectors.toMap(Function.identity(), this::parseLines));
 
         List<Integer> lineCounts = parsed.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
-            .filter(e ->
-            {
-              try
-              {
-                Files.write(e.getKey().resolveSibling(e.getKey().getFileName().toString() + "_converted.tsv"),
-                    e.getValue());
-                return true;
-              }
-              catch(IOException ex)
-              {
-                success.set(false);
-                return false;
-              }
-            }).map(e -> e.getValue().size())
+            .filter(e -> exportResult(e.getKey(), e.getValue()))
+            .map(e -> e.getValue().size())
             .collect(Collectors.toList());
 
-        if(success.get())
+        if(parsed.size() == lineCounts.size())
         {
+          success = true;
           new Alert(Alert.AlertType.INFORMATION,"Parsed " + lineCounts.stream().reduce(0, Integer::sum)
               + " lines over " + lineCounts.size() + " files.").showAndWait();
         }
@@ -135,29 +111,79 @@ public class FileConverterController implements Initializable
         dropArea.getStyleClass().remove("working");
       }
 
-      dragEvent.setDropCompleted(success.get());
+      dragEvent.setDropCompleted(success);
       dragEvent.consume();
     });
   }
 
   @FXML
-  private void loadConfig(ActionEvent actionEvent)
+  private void loadConfig(ActionEvent a)
   {
-    actionEvent.consume();
+    AtomicBoolean success = new AtomicBoolean(false);
+    try
+    {
+      FXMLLoader loader = new FXMLLoader();
+      URL fxml = getClass().getResource("Settings.fxml");
+      if(fxml != null)
+      {
+        Parent root = loader.load(fxml.openStream());
 
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        URL css = getClass().getResource("style.css");
+        if(css != null)
+        {
+          stage.getScene().getStylesheets().add(css.toExternalForm());
+        }
+        stage.setTitle("File Converter");
+
+        ((SettingsController) loader.getController()).parserProperty().addListener((obs, oldVal, newVal) ->
+        {
+          if(newVal != null)
+          {
+            setParser(newVal);
+            success.set(true);
+          }
+        });
+        stage.showAndWait();
+      }
+    }
+    catch(IOException ex)
+    {
+      success.set(legacyLoadConfig(a));
+    }
+
+    if(success.get())
+    {
+      getDropArea().getStyleClass().add("ready");
+      new Alert(Alert.AlertType.INFORMATION,"Configuration loaded.").showAndWait();
+      getStatusLabel().setText("Configuration loaded.");
+    }
+    else
+    {
+      getDropArea().getStyleClass().remove("ready");
+      new Alert(Alert.AlertType.ERROR,"Error in configuration file.").showAndWait();
+      getStatusLabel().setText("Error in configuration file.");
+    }
+  }
+
+  @FXML
+  @SuppressWarnings("unused")
+  private boolean legacyLoadConfig(ActionEvent a)
+  {
     FileChooser configChooser = new FileChooser();
     configChooser.getExtensionFilters().clear();
     configChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration files","*.cfg"));
     configChooser.setTitle("Open Configuration File");
 
     File configFile = configChooser.showOpenDialog(getRootPane().getScene().getWindow());
-    boolean success = Optional.ofNullable(configFile)
+    return Optional.ofNullable(configFile)
         .flatMap(Configuration::fromFile)
         .flatMap(config ->
         {
           FileChooser templateChooser = new FileChooser();
           templateChooser.getExtensionFilters().clear();
-          templateChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Template files", "*.csv"));
+          templateChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Template files","*.csv"));
           templateChooser.setTitle("Open Input Template File");
 
           Optional<String> configName = Optional.ofNullable(templateChooser.showOpenDialog(getRootPane().getScene().getWindow()))
@@ -179,18 +205,33 @@ public class FileConverterController implements Initializable
           getConfigLabel().setText("Current Configuration: " + configName.orElse("-/-"));
           return configName;
         }).isPresent();
+  }
 
-    if(success)
+  private List<String> parseLines(Path path)
+  {
+    try
     {
-      getDropArea().getStyleClass().add("ready");
-      new Alert(Alert.AlertType.INFORMATION,"Configuration loaded.").showAndWait();
-      getStatusLabel().setText("Configuration loaded.");
+      return Stream.concat(Stream.of(getParser().encodeHeader()), Files.lines(path)
+          .skip(1)
+          .map(getParser()::translate))
+          .collect(Collectors.toList());
     }
-    else
+    catch(IOException ex)
     {
-      getDropArea().getStyleClass().remove("ready");
-      new Alert(Alert.AlertType.ERROR,"Error in configuration file.").showAndWait();
-      getStatusLabel().setText("Error in configuration file.");
+      return Collections.emptyList();
+    }
+  }
+
+  private boolean exportResult(Path path, List<String> data)
+  {
+    try
+    {
+      Files.write(path.resolveSibling(path.getFileName().toString() + "_converted.tsv"), data);
+      return true;
+    }
+    catch(IOException ex)
+    {
+      return false;
     }
   }
 }
