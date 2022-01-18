@@ -48,38 +48,44 @@ public class SimpleRule<I, O> extends Rule<I, O>
       case STATIC:
         return new Result<>(getOutLabel(),this, getOutVal());
       case SPECIAL:
-        if(getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
-        {
-          return new Result<>(getOutLabel(),this, (O) Instant.now());
-        }
-        else if(getInType() == DataType.INSTANT && getOutType() == DataType.LOCALDATE)
-        {
-          return Optional.ofNullable(value)
-              .or(() -> Optional.ofNullable(getInVal()))
-              .map(Instant.class::cast)
-              .map(val -> val.atZone(ZoneOffset.UTC))
-              .map(ZonedDateTime::toLocalDate)
-              .map(val -> new Result<>(getOutLabel(),this, (O) val))
-              .orElse(null);
-        }
-        else if(getInType() == DataType.INSTANT && getOutType() == DataType.STRING)
-        {
-          try
-          {
-            return new Result<>(getOutLabel(),this, (O) DateTimeFormatter.ofPattern(getOutVal().toString())
-                    .format(((Instant) value).atOffset(ZoneOffset.UTC)));
-          }
-          catch(DateTimeParseException ex)
-          {
-            return null;
-          }
-        }
-        else
-        {
-          return null;
-        }
+        return applySpecialMode(value);
       default:
         return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Result<O> applySpecialMode(I value)
+  {
+    if(getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
+    {
+      return new Result<>(getOutLabel(),this, (O) Instant.now());
+    }
+    else if(getInType() == DataType.INSTANT && getOutType() == DataType.LOCALDATE)
+    {
+      return Optional.ofNullable(value)
+          .or(() -> Optional.ofNullable(getInVal()))
+          .map(Instant.class::cast)
+          .map(val -> val.atZone(ZoneOffset.UTC))
+          .map(ZonedDateTime::toLocalDate)
+          .map(val -> new Result<>(getOutLabel(),this, (O) val))
+          .orElse(null);
+    }
+    else if(getInType() == DataType.INSTANT && getOutType() == DataType.STRING)
+    {
+      try
+      {
+        return new Result<>(getOutLabel(),this, (O) DateTimeFormatter.ofPattern(getOutVal().toString())
+            .format(((Instant) value).atOffset(ZoneOffset.UTC)));
+      }
+      catch(DateTimeParseException ex)
+      {
+        return null;
+      }
+    }
+    else
+    {
+      return null;
     }
   }
 

@@ -45,26 +45,12 @@ public class FileConverterController implements Initializable
     dropArea.getStyleClass().add("dashed-border");
     dropArea.setOnDragEntered(dragEvent ->
     {
-      if(getParser().isReady())
-      {
-        dropArea.getStyleClass().add("highlight");
-      }
-      else
-      {
-        dropArea.getStyleClass().add("blocked");
-      }
+      dropArea.getStyleClass().add(getParser().isReady() ? "highlight" : "blocked");
       dragEvent.consume();
     });
     dropArea.setOnDragExited(dragEvent ->
     {
-      if(getParser().isReady())
-      {
-        dropArea.getStyleClass().remove("highlight");
-      }
-      else
-      {
-        dropArea.getStyleClass().remove("blocked");
-      }
+      dropArea.getStyleClass().remove(getParser().isReady() ? "highlight" : "blocked");
       dragEvent.consume();
     });
     dropArea.setOnDragOver(dragEvent ->
