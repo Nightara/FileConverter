@@ -14,15 +14,27 @@
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="50.0" />
       </columnConstraints>
-      <Label text="Field Separator:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+      <Label text="Field Separator:ˀ" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0">
+        <tooltip>
+          <Tooltip text="The field separator in the RedCAP input file, usually a semicolon." />
+        </tooltip>
+      </Label>
       <ComboBox fx:id="fieldSeparatorBox" maxWidth="1.7976931348623157E308"
                 promptText="Semicolon (Default)" GridPane.columnIndex="2"
                 GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
-      <Label text="Config File:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+      <Label text="Config File:ˀ" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+        <tooltip>
+          <Tooltip text="A .cfg file containing the translation rules, e.g. patient.cfg or weekly.cfg." />
+        </tooltip>
+      </Label>
       <TextField fx:id="selectConfigField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <Button mnemonicParsing="false" onAction="#selectConfigFile"
               text="Choose file..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <Label text="Template File:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+      <Label text="Template File:ˀ" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+        <tooltip>
+          <Tooltip text="An example RedCAP input file for the converter, e.g. the file that will be converted later." />
+        </tooltip>
+      </Label>
       <TextField fx:id="selectTemplateField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <Button mnemonicParsing="false" onAction="#selectTemplateFile"
               text="Choose file..." GridPane.columnIndex="2" GridPane.rowIndex="3" />
@@ -36,7 +48,11 @@
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="50.0" />
       </columnConstraints>
-      <Label text="Field Separator:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+      <Label text="Field Separator:ˀ" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0">
+        <tooltip>
+          <Tooltip text="The field separator in the OpenBIS output file, usually a tab character." />
+        </tooltip>
+      </Label>
       <ComboBox fx:id="outFieldSeparatorBox" maxWidth="1.7976931348623157E308"
                 promptText="Tab (Default)" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS"
                 GridPane.rowIndex="0" />
