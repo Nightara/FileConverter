@@ -46,7 +46,8 @@
       <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
         <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
-        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="50.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" percentWidth="25.0" />
       </columnConstraints>
       <Label text="Field Separator:ˀ" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0">
         <tooltip>
@@ -58,9 +59,9 @@
                 GridPane.rowIndex="0" />
       <Label text="Output Directory:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
       <TextField fx:id="selectOutputField" disable="true" text="None (Use original directory)"
-                 GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                 GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
       <Button mnemonicParsing="false" onAction="#selectOutputDir" disable="true"
-              text="Choose directory..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
+              text="Choose directory..." GridPane.columnIndex="3" GridPane.rowIndex="2" />
     </GridPane>
   </TitledPane>
   <Button mnemonicParsing="false" text="Save Options" VBox.vgrow="NEVER" onAction="#saveOptions" />
