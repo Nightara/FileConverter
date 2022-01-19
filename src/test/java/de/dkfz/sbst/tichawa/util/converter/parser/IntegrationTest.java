@@ -22,12 +22,19 @@ class IntegrationTest
       .fromFile(Configuration.class.getResourceAsStream("/weekly.cfg"))
       .orElse(new Configuration(new LinkedList<>()));
 
+  private static final String ANAM_LABELS = "record_id;redcap_event_name;redcap_repeat_instrument;redcap_repeat_instance;redcap_data_access_group;patient_id_enroll_fu;weight_enroll_fu;height_enroll_fu;bmi_enroll_fu;visit_type_enroll_fu;visit_date_enroll_fu;basic_renal_disease_enroll_fu;dkd_enroll_fu;htn_enroll_fu;gn_enroll_fu;gn_type_enroll_fu___1;gn_type_enroll_fu___2;gn_type_enroll_fu___3;gn_type_enroll_fu___4;gn_type_enroll_fu___5;gn_type_enroll_fu___6;gn_type_enroll_fu___7;gn_type_enroll_fu___8;gn_type_enroll_fu___9;gn_type_enroll_fu___10;gn_type_enroll_fu___11;gn_type_enroll_fu___12;gn_other_enroll_fu;fsgs_enroll_fu;geneticdis_enroll_fu;geneticdis_type_enroll_fu___1;geneticdis_type_enroll_fu___2;geneticdis_type_enroll_fu___3;geneticdis_type_enroll_fu___4;geneticdis_type_enroll_fu___5;geneticdis_type_enroll_fu___6;geneticdis_other_enroll_fu;intnephr_enroll_fu;intnephr_type_enroll_fu;intnephr_other_enroll_fu;amyloidosis_enroll_fu;other_kiddis_enroll_fu;other_kiddis_type_enroll_fu;cvd_enroll_fu;cvd_type_enroll_fu___1;cvd_type_enroll_fu___2;cvd_type_enroll_fu___3;cvd_type_enroll_fu___4;cvd_type_enroll_fu___5;cvd_type_enroll_fu___6;cvd_other_enroll_fu;thrombev_enroll_fu;thrombev_type_enroll_fu___1;thrombev_type_enroll_fu___2;thrombev_type_enroll_fu___3;thrombev_other_enroll_fu;diab_enroll_fu;thyroiddys_enroll_fu;thyroiddys_type_enroll_fu;rheumdiseas_enroll_fu;rheumdis_type_enroll_fu___1;rheumdis_type_enroll_fu___2;maligdiseas_enroll_fu;maligdiseas_type_enroll_fu;infectdis_enroll_fu;infectdis_type_enroll_fu___1;infectdis_type_enroll_fu___2;infectdis_type_enroll_fu___3;infectdis_type_enroll_fu___4;infectdis_type_enroll_fu___5;infectdis_type_enroll_fu___6;infectdis_type_enroll_fu___7;hepatitis_type_enroll_fu;hiv_infect_type_enroll_fu;bactinfect_type_enroll_fu;infectdis_other_enroll_fu;ibd_enroll_fu;ibd_type_enroll_fu;allergies_enroll_fu;allergies_type_enroll_fu;hearinglo_enroll_fu;otherdis_enroll_fu;otherdis_type_enroll_fu;dialysisobl_enroll_fu;conddialy_enroll_fu;conddialy_year_enroll_fu;conddialys_npw_enroll_fu;condialys_dpw_enroll_fu;typdialys_enroll_fu;pretranspl_enroll_fu;transpl_type_enroll_fu___1;transpl_type_enroll_fu___2;transpl_type_enroll_fu___3;transpl_type_enroll_fu___4;transpl_type_enroll_fu___5;transpl_type_enroll_fu___6;transpl_type_enroll_fu___7;kidtrans_date_enroll_fu;primarydis_kid_enroll_fu;livertrans_date_enroll_fu;primarydis_liv_enroll_fu;lungtrans_date_enroll_fu;primarydis_lung_enroll_fu;hearttrans_date_enroll_fu;primarydis_heart_enroll_fu;panctrans_date_enroll_fu;primarydis_panc_enroll_fu;bmtrans_date_enroll_fu;primarydis_bm_enroll_fu;othertrans_date_enroll_fu;primarydis_other_enroll_fu;comments_anam_enroll_fu;test_anamnesis_diagnosis_enroll_fu_complete";
+  private static final String ANAM_DATA = "1;enrollment_arm_1;;;;N1-000;65;165;24;1;18.05.2021;2;2;1;1;0;0;0;0;0;0;0;0;0;0;0;0;;1;1;0;0;0;0;0;0;;1;;;1;1;;1;0;0;0;0;0;0;;1;0;0;0;;2;1;;1;0;0;1;;1;0;0;0;0;0;0;0;;;;;1;;2;penicillin;1;1;;2;2;2010;3;4;1;1;0;0;0;0;0;0;0;;;;;;;;;;;;;;;;2";
+  private static final Configuration ANAM_CONFIG = Configuration
+      .fromFile(Configuration.class.getResourceAsStream("/anamnesis.cfg"))
+      .orElse(new Configuration(new LinkedList<>()));
+
   @SuppressWarnings("unused")
   private static Stream<Arguments> generateTestSets()
   {
     return Stream.of(
         Arguments.of(PATIENT_CONFIG, PATIENT_DATA, PATIENT_LABELS, "\t", "\t"),
-        Arguments.of(WEEKLY_CONFIG, WEEKLY_DATA, WEEKLY_LABELS, "\t", "\t")
+        Arguments.of(WEEKLY_CONFIG, WEEKLY_DATA, WEEKLY_LABELS, "\t", "\t"),
+        Arguments.of(ANAM_CONFIG, ANAM_DATA, ANAM_LABELS, ";", ";")
     );
   }
 
