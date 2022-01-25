@@ -21,7 +21,7 @@ class SimpleStringParserTest
     RULES.add((Rule<Object, Object>) thirdRule);
   }
   private static final Configuration CONFIG = new Configuration(RULES);
-  private static final SimpleStringParser PARSER = new SimpleStringParser("\t","\n",
+  private static final SimpleStringParser PARSER = new SimpleStringParser("Custom","\t","\n",
       CONFIG, Arrays.asList("in_one", "in_two"));
 
   @Test

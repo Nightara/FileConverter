@@ -126,7 +126,7 @@ public class SettingsController implements Initializable
     String fieldSeparator = getSelectedOrDefault(fieldSeparatorBox).toString();
     String outFieldSeparator = getSelectedOrDefault(outFieldSeparatorBox).toString();
 
-    Parser<String, String> parser = new SimpleStringParser(fieldSeparator, outFieldSeparator);
+    Parser<String, String> parser = new SimpleStringParser("Custom", fieldSeparator, outFieldSeparator);
     getConfig().ifPresent(conf -> getHeaders().ifPresent(head -> parser.configure(conf, head)));
     parserProperty().setValue(parser);
 

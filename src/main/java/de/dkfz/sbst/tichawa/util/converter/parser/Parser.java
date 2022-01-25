@@ -8,6 +8,8 @@ public interface Parser<I, O>
   boolean configure(Configuration configuration, String... inHeaders);
   boolean isReady();
 
+  String getName();
+
   Optional<String[]> parseHeaderLine(I input);
 
   Map<String, Rule.Result<Object>> parse(I input);

@@ -2,6 +2,8 @@ package de.dkfz.sbst.tichawa.util.converter;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
+import javafx.beans.binding.*;
+import javafx.beans.property.*;
 import javafx.event.*;
 import javafx.fxml.*;
 import javafx.scene.*;
@@ -23,8 +25,8 @@ import java.util.stream.*;
 @Getter(AccessLevel.PRIVATE)
 public class FileConverterController implements Initializable
 {
-  @Setter(AccessLevel.PRIVATE)
-  private Parser<String, String> parser = new SimpleStringParser(";", "\t");
+  private final StringProperty status = new SimpleStringProperty("No configuration loaded.");
+  private final ObjectProperty<Parser<String, String>> parser = new SimpleObjectProperty<>();
 
   @FXML
   private BorderPane rootPane;
@@ -45,17 +47,17 @@ public class FileConverterController implements Initializable
     dropArea.getStyleClass().add("dashed-border");
     dropArea.setOnDragEntered(dragEvent ->
     {
-      dropArea.getStyleClass().add(getParser().isReady() ? "highlight" : "blocked");
+      dropArea.getStyleClass().add(getParser().isNull().get() ? "blocked" : "highlight");
       dragEvent.consume();
     });
     dropArea.setOnDragExited(dragEvent ->
     {
-      dropArea.getStyleClass().remove(getParser().isReady() ? "highlight" : "blocked");
+      dropArea.getStyleClass().remove(getParser().isNull().get() ? "blocked" : "highlight");
       dragEvent.consume();
     });
     dropArea.setOnDragOver(dragEvent ->
     {
-      if(dragEvent.getDragboard().hasFiles() && getParser().isReady())
+      if(dragEvent.getDragboard().hasFiles() && getParser().getValue().isReady())
       {
         dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
       }
@@ -66,7 +68,7 @@ public class FileConverterController implements Initializable
     {
       boolean success = false;
       Dragboard db = dragEvent.getDragboard();
-      if(db.hasFiles() && getParser().isReady())
+      if(db.hasFiles() && getParser().isNotNull().get())
       {
         dropArea.getStyleClass().add("working");
         Map<Path, List<String>> parsed = db.getFiles().stream()
@@ -100,6 +102,10 @@ public class FileConverterController implements Initializable
       dragEvent.setDropCompleted(success);
       dragEvent.consume();
     });
+
+    configLabel.textProperty().bind(Bindings.createStringBinding(() ->
+        "Configuration: " + (parser.isNull().get() ? "-/-" : parser.get().getName()), parser));
+    statusLabel.textProperty().bind(status);
   }
 
   @FXML
@@ -127,7 +133,7 @@ public class FileConverterController implements Initializable
         {
           if(newVal != null)
           {
-            setParser(newVal);
+            getParser().set(newVal);
             success.set(true);
           }
         });
@@ -142,15 +148,16 @@ public class FileConverterController implements Initializable
     if(success.get())
     {
       getDropArea().getStyleClass().add("ready");
-      new Alert(Alert.AlertType.INFORMATION,"Configuration loaded.").showAndWait();
-      getStatusLabel().setText("Configuration loaded.");
+      getStatus().set("Configuration loaded.");
     }
     else
     {
       getDropArea().getStyleClass().remove("ready");
-      new Alert(Alert.AlertType.ERROR,"Error in configuration file.").showAndWait();
-      getStatusLabel().setText("Error in configuration file.");
+      getStatus().set("Error in configuration file..");
     }
+
+    new Alert(getStatus().get().contains("Error") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION,
+        getStatus().get()).showAndWait();
   }
 
   @FXML
@@ -184,8 +191,8 @@ public class FileConverterController implements Initializable
                 {
                   return null;
                 }
-              }).flatMap(getParser()::parseHeaderLine)
-              .filter(inHeaders -> getParser().configure(config, inHeaders))
+              }).flatMap(getParser().get()::parseHeaderLine)
+              .filter(inHeaders -> getParser().get().configure(config, inHeaders))
               .map(h -> configFile.getName());
 
           getConfigLabel().setText("Current Configuration: " + configName.orElse("-/-"));
@@ -197,9 +204,9 @@ public class FileConverterController implements Initializable
   {
     try
     {
-      return Stream.concat(Stream.of(getParser().encodeHeader()), Files.lines(path)
+      return Stream.concat(Stream.of(getParser().get().encodeHeader()), Files.lines(path)
           .skip(1)
-          .map(getParser()::translate))
+          .map(getParser().get()::translate))
           .collect(Collectors.toList());
     }
     catch(IOException ex)
