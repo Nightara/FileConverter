@@ -83,18 +83,12 @@ public class FileConverterController implements Initializable
             .map(e -> e.getValue().size())
             .collect(Collectors.toList());
 
-        if(parsed.size() == lineCounts.size())
-        {
-          success = true;
-          new Alert(Alert.AlertType.INFORMATION,"Parsed " + lineCounts.stream().reduce(0, Integer::sum)
-              + " lines over " + lineCounts.size() + " files.").showAndWait();
-        }
-        else
-        {
-          new Alert(Alert.AlertType.ERROR,"Parsed " + lineCounts.stream().reduce(0, Integer::sum)
-              + " lines over " + lineCounts.size() + " files. " + (parsed.size() - lineCounts.size())
-              + " files produced errors.").showAndWait();
-        }
+        success = parsed.size() == lineCounts.size();
+        new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR,
+            "Parsed " + lineCounts.stream().reduce(0, Integer::sum)
+                + " lines over " + lineCounts.size() + " files."
+                + (parsed.size() - lineCounts.size()) + " files produced errors.")
+            .showAndWait();
 
         dropArea.getStyleClass().remove("working");
       }
