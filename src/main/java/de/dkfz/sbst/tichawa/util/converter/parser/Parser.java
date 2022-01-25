@@ -1,6 +1,8 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
+
+import java.nio.file.*;
 import java.util.*;
 
 public interface Parser<I, O>
@@ -9,6 +11,7 @@ public interface Parser<I, O>
   boolean isReady();
 
   String getName();
+  Path getOutputPath();
 
   Optional<String[]> parseHeaderLine(I input);
 
@@ -19,5 +22,10 @@ public interface Parser<I, O>
   default O translate(I input)
   {
     return encode(parse(input));
+  }
+
+  default boolean hasOutputPath()
+  {
+    return getOutputPath() != null;
   }
 }

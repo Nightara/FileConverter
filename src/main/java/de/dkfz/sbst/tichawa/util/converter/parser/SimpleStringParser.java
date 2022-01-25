@@ -3,6 +3,7 @@ package de.dkfz.sbst.tichawa.util.converter.parser;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import lombok.*;
 
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.*;
@@ -17,6 +18,7 @@ public class SimpleStringParser implements Parser<String, String>
       "T(\\d{2}):(\\d{2}):(\\d{2})Z$");
 
   private final String name;
+  private final Path outputPath;
   private final String inSeparator;
   private final String outSeparator;
 

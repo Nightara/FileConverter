@@ -70,6 +70,7 @@ public class FileConverterController implements Initializable
       Dragboard db = dragEvent.getDragboard();
       if(db.hasFiles() && getParser().isNotNull().get())
       {
+        Parser<String, String> innerParser = getParser().get();
         dropArea.getStyleClass().add("working");
         Map<Path, List<String>> parsed = db.getFiles().stream()
             .filter(File::isFile)
@@ -79,7 +80,8 @@ public class FileConverterController implements Initializable
 
         List<Integer> lineCounts = parsed.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
-            .filter(e -> exportResult(e.getKey(), e.getValue()))
+            .filter(e -> exportResult(innerParser.hasOutputPath() ?
+                innerParser.getOutputPath().resolve(e.getKey().getFileName()) : e.getKey(), e.getValue()))
             .map(e -> e.getValue().size())
             .collect(Collectors.toList());
 

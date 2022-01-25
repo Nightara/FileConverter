@@ -34,6 +34,8 @@ public class SettingsController implements Initializable
   private final Property<Parser<String, String>> parserProperty = new SimpleObjectProperty<>();
 
   @Setter(AccessLevel.PRIVATE)
+  private Path outputPath;
+  @Setter(AccessLevel.PRIVATE)
   private String[] headers;
   @Setter(AccessLevel.PRIVATE)
   private Configuration config;
@@ -116,7 +118,15 @@ public class SettingsController implements Initializable
   @SuppressWarnings("unused")
   private void selectOutputDir(ActionEvent a)
   {
-    // TODO: Store output dir.
+    DirectoryChooser outputChooser = new DirectoryChooser();
+    outputChooser.setTitle("Open Output Directory");
+
+    File outputDir = outputChooser.showDialog(getRootPane().getScene().getWindow());
+    if(outputDir.exists() && outputDir.isDirectory())
+    {
+      setOutputPath(outputDir.toPath());
+      selectOutputField.setText(outputDir.toString());
+    }
   }
 
   @FXML
@@ -126,7 +136,8 @@ public class SettingsController implements Initializable
     String fieldSeparator = getSelectedOrDefault(fieldSeparatorBox).toString();
     String outFieldSeparator = getSelectedOrDefault(outFieldSeparatorBox).toString();
 
-    Parser<String, String> parser = new SimpleStringParser("Custom", fieldSeparator, outFieldSeparator);
+    Parser<String, String> parser = new SimpleStringParser("Custom", getOutputPath(),
+        fieldSeparator, outFieldSeparator);
     getConfig().ifPresent(conf -> getHeaders().ifPresent(head -> parser.configure(conf, head)));
     parserProperty().setValue(parser);
 

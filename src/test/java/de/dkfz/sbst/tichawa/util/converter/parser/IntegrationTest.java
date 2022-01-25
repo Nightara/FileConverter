@@ -45,7 +45,7 @@ class IntegrationTest
   @MethodSource("generateTestSets")
   void parseData(Configuration config, String rawData, String rawLabels, String dataSeparator, String rawSeparator)
   {
-    SimpleStringParser parser = new SimpleStringParser("Custom", dataSeparator, rawSeparator);
+    SimpleStringParser parser = new SimpleStringParser("Custom",null, dataSeparator, rawSeparator);
     parser.parseHeaderLine(rawLabels).ifPresent(inHeaders -> parser.configure(config, inHeaders));
     Map<String, Rule.Result<Object>> results = parser.parse(rawData);
 
