@@ -28,7 +28,9 @@ class IntegrationTest
       .fromFile(Configuration.class.getResourceAsStream("/anamnesis.cfg"))
       .orElse(new Configuration(new LinkedList<>()));
 
-  // TODO: Add monthly test.
+  // TODO: Add test for monthly.
+  // TODO: Add test for medication.
+  // TODO: Add questionnaire config.
   @SuppressWarnings("unused")
   private static Stream<Arguments> generateTestSets()
   {
