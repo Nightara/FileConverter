@@ -28,6 +28,7 @@ class IntegrationTest
       .fromFile(Configuration.class.getResourceAsStream("/anamnesis.cfg"))
       .orElse(new Configuration(new LinkedList<>()));
 
+  // TODO: Add monthly test.
   @SuppressWarnings("unused")
   private static Stream<Arguments> generateTestSets()
   {
