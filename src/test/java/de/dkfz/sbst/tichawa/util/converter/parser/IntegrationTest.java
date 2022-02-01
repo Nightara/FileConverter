@@ -28,16 +28,34 @@ class IntegrationTest
       .fromFile(Configuration.class.getResourceAsStream("/anamnesis.cfg"))
       .orElse(new Configuration(new LinkedList<>()));
 
-  // TODO: Add test for monthly.
-  // TODO: Add test for medication.
-  // TODO: Add questionnaire config.
+  private static final String MONTHLY_LABELS = "record_id;redcap_event_name;redcap_repeat_instrument;redcap_repeat_instance;redcap_data_access_group;patient_id_labmon_m;blood_collection_date_m;blood_timepoint_m;clinical_chemist_m;creatinine_m;egfr_m;urea_m;albumin_m;total_protein_m;uric_acid_m;hba1c_m;urea_reduction_rate_m;hematology_m;hemoglobin_m;platelets_m;leucocytes_m;reticulocytes_m;rpi_m;ironstatus_m;transferrin_saturation_m;ferritin_m;transferrin_m;iron_m;bone_metabolism_m;ipht_m;calcium_m;calcium_total_m;phosphate_m;oh_vitamin_d_m;electrolytes_m;sodium_m;potassium_m;magnesium_m;chloride_m;glucose_m;infect_parameter_m;crp_m;coagulation;quick_m;inr_m;aptt_m;factor_vlll_m;factor_vll_m;protein_s_m;protein_c_m;antithrombin_lll_m;fibrinogen_m;d_dimere_m;pfa_m;bga_m;ph_m;po2_m;pco2_m;hco_3_current_m;hco_3_standard_m;be_m;spo_2_m;fmethb_m;cthb_m;hct_m;so2_m;fo2hb_m;fcohb_m;fhhb_m;ck_bga_m;cna_m;cca_m;ccl_m;cglu_m;clac_m;ctbil_m;vitamins_m;folic_acid_m;vitamin_b_12_m;vitamin_b6_m;liver_parameter_m;got_m;gpt_m;ggt_m;billirubin_total_m;billirubin_direct_m;billirubin_indirect_m;ldh_m;lipase_m;heart_parameter_m;ck_m;ck_mb_m;thyroid_m;ft_3_m;ft_4_m;tsh_m;blood_lipids_m;ldl_m;hdl_m;triglyceride_m;cholesterol_m;infect_serology_m;hepatitis_b_m;hepatitis_c_m;hiv_m;tumor_marker_m;psa_m;immunisation_m;hla_ak_m;differential_blood_count_m;neutrophils_m;lypmhocytes_m;monocytes_m;eosinophil_m;basophils;comments_lab_values_m;test_lab_values_monthly_complete";
+  private static final String MONTHLY_DATA = "001;monthly_collection_arm_1;;1;;N1-000;2021-05-20;1;2;2;56;35;26;55;ND;7.1;ND;2;8.1;122;7.5;0.6;ND;2;16;166;ND;ND;2;455;2.4;ND;1.9;ND;2;144;4.9;ND;ND;ND;2;7;2;80;1.1;33;ND;ND;ND;ND;ND;3.4;ND;ND;2;7.35;35;67;17;18;\" -4\";76;ND;ND;35;ND;ND;ND;ND;5.3;147;1.5;ND;180;1.6;6;1;;;;2;77;65;30;3;2;ND;ND;ND;1;;;;;;;1;;;;;1;;;;1;;1;;1;;;;;;;1";
+  private static final Configuration MONTHLY_CONFIG = Configuration
+      .fromFile(Configuration.class.getResourceAsStream("/monthly.cfg"))
+      .orElse(new Configuration(new LinkedList<>()));
+
+  private static final String MED_LABELS = "record_id;redcap_event_name;redcap_repeat_instrument;redcap_repeat_instance;redcap_data_access_group;patient_id_allph;visittimepoint_allph;medication_allph1;medication_type_allph___1;medication_type_allph___2;medication_type_allph___3;medication_type_allph___4;medication_type_allph___5;medication_type_allph___6;medication_type_allph___7;medication_type_allph___8;medication_type_allph___9;medication_type_allph___10;medication_type_allph___11;medication_type_allph___12;medication_type_allph___13;medication_type_allph___14;drugname_antib_allph;drugdose_antib_allph;start_antib_allph;indic_antib_allph;drugname_ironsup_allph;start_ironsup_allph;drugdose_ironsup_allph;wdrugdose_ironsup_allph;drugname_diuret_allph;start_diuret_allph;drugdose_diuret_allph;wdrugdose_diuret_allph;drugname_epo_allph;start_epo_allph;drugdose_epo_allph;wdrugdose_epo_allph;drugname_analg_allph;start_analg_allph;drugdose_analg_allph;wdrugdose_analg_allph;drugname_anticoag_allph;drugdose_anticoag_allph;start_anticoag_allph;indic_anticoag_allph;drugname_aceinh_allph;drugdose_aceinh_allph;start_aceinh_allph;indic_aceinh_allph;drugname_calciumant_allph;drugdose_calciumant_allph;start_calciumant_allph;indic_calciumant_allph;drugname_betablo_allph;drugdose_betablo_allph;start_betablo_allph;indic_betablo_allph;drugname_statin_allph;drugdose_statin_allph;start_statin_allph;indic_statin_allph;drugname_antdiab_allph;drugdose_antdiab_allph;start_antdiab_allph;indic_antdiab_allph;drugname_insul_allph;drugdose_insul_allph;start_insul_allph;indic_insul_allph;drugname_chemo_allph;drugdose_chemo_allph;start_chemo_allph;indic_chemo_allph;immunsupp_allph;immunsupp_type_allph___1;immunsupp_type_allph___2;immunsupp_type_allph___3;immunsupp_type_allph___4;immunsupp_type_allph___5;immunsupp_type_allph___6;immunsupp_type_allph___7;drugdose_steroids_allph;drugdose_mycoph_allph;drugdose_tacrol_allph;drugdose_azath_allph;drugdose_sirol_allph;drugdose_everol_allph;drugdose_other_allphenter;test_medication_all_phases_complete";
+  private static final String MED_DATA = "001;medication_all_pha_arm_1;;1;;N1-000;7;1;0;1;1;1;1;0;1;0;0;0;0;0;0;0;;;;;Ferrlecit;2010-01-01;;\"187.5 mg\";Torasemid;2009-01-01;;\"100 mg\";\"Epo alfa\";2010-01-01;;\"3000 I.E.\";Metamizol;2020-01-01;;\"7 g\";;;;;;;2010-01-01;;;;;;;;;;;;;;;;;;;;;;;;;;2;1;0;0;0;0;0;0;5;;;;;;;1";
+  private static final Configuration MED_CONFIG = Configuration
+      .fromFile(Configuration.class.getResourceAsStream("/medication.cfg"))
+      .orElse(new Configuration(new LinkedList<>()));
+
+  private static final String QUEST_LABELS = "record_id;redcap_event_name;redcap_repeat_instrument;redcap_repeat_instance;redcap_data_access_group;patient_id_question;ethnicity_question;ethn_other_question;visit_date_question;visit_timepoint_question;weight_question;body_height_question;famstroke_question;famstroke_yes_question;famstroke_year;eating_habits_question;eatinghabits_other_question;meat_meal_question;smokinghab_question;cigarette_yes_question;ecigarette_yes_question;cigar_yes_question;ex_smoker_yes_question;tobacco_start_question;tobacco_stop_question;alcohol_question;diuresis_question;chronic_wounds_question;leg_edema_question;occupation_question;occuppation_other_question;firststart_dial_question;frequency_dial_question;timframe_dial_question;sporting_question;allergies_question;fatigue_question;nyha_question;ccs_score_question;famkidney_question;famkidney_yes_question;famkidneytype_yes_question;test_questionnaire_enroll_fu_complete";
+  private static final String QUEST_DATA = "001;questionnaire_enro_arm_1;;1;;N1-000;1;;2021-05-19;1;65;165;1;;;4;Frutarier;2;2;20;;;;;10/1990;200;100;\"right lower leg\";1;1;;04/2010;2;4;6;ND;3;1;6;2;sister;insufficiency;1";
+  private static final Configuration QUEST_CONFIG = Configuration
+      .fromFile(Configuration.class.getResourceAsStream("/questionnaire.cfg"))
+      .orElse(new Configuration(new LinkedList<>()));
+
   @SuppressWarnings("unused")
   private static Stream<Arguments> generateTestSets()
   {
     return Stream.of(
         Arguments.of(PATIENT_CONFIG, PATIENT_DATA, PATIENT_LABELS, "\t", "\t"),
         Arguments.of(WEEKLY_CONFIG, WEEKLY_DATA, WEEKLY_LABELS, "\t", "\t"),
-        Arguments.of(ANAM_CONFIG, ANAM_DATA, ANAM_LABELS, ";", ";")
+        Arguments.of(ANAM_CONFIG, ANAM_DATA, ANAM_LABELS, ";", ";"),
+        Arguments.of(MONTHLY_CONFIG, MONTHLY_DATA, MONTHLY_LABELS, ";", ";"),
+        Arguments.of(MED_CONFIG, MED_DATA, MED_LABELS, ";", ";"),
+        Arguments.of(QUEST_CONFIG, QUEST_DATA, QUEST_LABELS, ";", ";")
     );
   }
 
