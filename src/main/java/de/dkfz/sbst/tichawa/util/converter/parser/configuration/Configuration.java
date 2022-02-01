@@ -25,7 +25,7 @@ public class Configuration
     PARSERS.put(DataType.STRING, Collections.singletonList(new ConfigParser<>(DataType.STRING,
         input -> input.replaceAll("\"", ""))));
     PARSERS.put(DataType.INTEGER, Collections.singletonList(new ConfigParser<>(DataType.INTEGER,
-        input ->  input.isBlank() ? null : Integer.parseInt(input))));
+        input ->  input.isBlank() || input.equals("ND") ? null : Integer.parseInt(input))));
     PARSERS.put(DataType.DOUBLE, Collections.singletonList(new ConfigParser<>(DataType.DOUBLE,
         input -> input.isBlank() || input.equals("ND") ? null : Double.parseDouble(input))));
     PARSERS.put(DataType.BOOLEAN, Arrays.asList(new ConfigParser<>(DataType.BOOLEAN, Boolean::parseBoolean),
@@ -46,6 +46,24 @@ public class Configuration
               else
               {
                 return EU_FORMATTER.parse(input, LocalDate::from)
+                    .atStartOfDay(ZoneOffset.UTC)
+                    .toInstant();
+              }
+            }),
+        new ConfigParser<>(DataType.INSTANT,
+            input ->
+            {
+              if(input.isBlank())
+              {
+                return null;
+              }
+              else if(input.equals("EPOCH"))
+              {
+                return Instant.EPOCH;
+              }
+              else
+              {
+                return DateTimeFormatter.ISO_DATE.parse(input, LocalDate::from)
                     .atStartOfDay(ZoneOffset.UTC)
                     .toInstant();
               }

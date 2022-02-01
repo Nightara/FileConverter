@@ -88,7 +88,7 @@ public class FileConverterController implements Initializable
         success = parsed.size() == lineCounts.size();
         new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR,
             "Parsed " + lineCounts.stream().reduce(0, Integer::sum)
-                + " lines over " + lineCounts.size() + " files."
+                + " lines over " + lineCounts.size() + " files. "
                 + (parsed.size() - lineCounts.size()) + " files produced errors.")
             .showAndWait();
 

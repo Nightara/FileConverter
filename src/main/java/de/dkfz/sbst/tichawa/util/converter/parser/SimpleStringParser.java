@@ -57,8 +57,10 @@ public class SimpleStringParser implements Parser<String, String>
     Map<String, Rule.Result<Object>> output = new HashMap<>();
     if(isReady())
     {
-      String[] data = input.split(getInSeparator());
-      if(data.length >= getInHeaders().size())
+      List<String> strippedData = Arrays.stream(input.split(getInSeparator()))
+          .map(line -> line.replace("\"", ""))
+          .collect(Collectors.toList());
+      if(strippedData.size() >= getInHeaders().size())
       {
         for(int x = 0; x < getInHeaders().size(); x++)
         {
@@ -70,7 +72,7 @@ public class SimpleStringParser implements Parser<String, String>
                   {
                     try
                     {
-                      return parser.apply(data[finalX]);
+                      return parser.apply(strippedData.get(finalX));
                     }
                     catch(Exception ex)
                     {
