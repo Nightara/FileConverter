@@ -9,6 +9,12 @@ fx:controller="de.dkfz.sbst.tichawa.util.converter.FileConverterController" fx:i
     <MenuBar>
       <Menu text="Configuration" fx:id="configMenu">
         <MenuItem text="Load Configuration" fx:id="loadConfig" onAction="#loadConfig" />
+        <MenuItem text="Preset: Enrollment" fx:id="loadEnrollment" onAction="#loadPreset" />
+        <MenuItem text="Preset: Anamnesis" fx:id="loadAnamnesis" onAction="#loadPreset" />
+        <MenuItem text="Preset: Questionnaire" fx:id="loadQuestionnaire" onAction="#loadPreset" />
+        <MenuItem text="Preset: Medication" fx:id="loadMedication" onAction="#loadPreset" />
+        <MenuItem text="Preset: Weekly Dialysis" fx:id="loadWeekly" onAction="#loadPreset" />
+        <MenuItem text="Preset: Monthly Lab Values" fx:id="loadMonthly" onAction="#loadPreset" />
         <MenuItem text="Current Configuration: -/-" fx:id="configLabel" disable="true" />
       </Menu>
     </MenuBar>
