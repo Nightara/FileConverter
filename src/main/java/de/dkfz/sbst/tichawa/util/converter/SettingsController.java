@@ -11,6 +11,7 @@ import javafx.stage.*;
 import javafx.util.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.fxmisc.easybind.*;
 
 import java.io.*;
 import java.net.*;
@@ -52,15 +53,20 @@ public class SettingsController implements Initializable
   private ComboBox<Character> outFieldSeparatorBox;
   @FXML
   private TextField selectOutputField;
+  @FXML
+  private Button saveButton;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle)
   {
-    getFieldSeparatorBox().setConverter(new SeparatorConverter(';'));
-    getFieldSeparatorBox().setItems(FXCollections.observableArrayList('\t', ',', ';'));
+    fieldSeparatorBox.setConverter(new SeparatorConverter(';'));
+    fieldSeparatorBox.setItems(FXCollections.observableArrayList('\t', ',', ';'));
 
-    getOutFieldSeparatorBox().setConverter(new SeparatorConverter('\t'));
-    getOutFieldSeparatorBox().setItems(FXCollections.observableArrayList('\t', ',', ';'));
+    outFieldSeparatorBox.setConverter(new SeparatorConverter('\t'));
+    outFieldSeparatorBox.setItems(FXCollections.observableArrayList('\t', ',', ';'));
+
+    saveButton.disableProperty().bind(selectConfigField.textProperty().isEmpty()
+        .or(selectTemplateField.textProperty().isEmpty()));
   }
 
   @FXML

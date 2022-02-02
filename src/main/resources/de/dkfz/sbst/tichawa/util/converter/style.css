@@ -5,6 +5,9 @@
   -fx-border-color: GRAY;
   -fx-border-style: dashed;
   -fx-border-radius: 5px;
+
+  -fx-background-insets: 8px;
+  -fx-background-radius: 5px;
 }
 .ready
 {
@@ -14,13 +17,13 @@
 {
   -fx-border-color: DARKORANGE;
 }
-.highlight
+.drag.highlight
+{
+  -fx-border-color: LIGHTGREEN !important;
+  -fx-background-color: LIGHTGRAY;
+}
+.drag.blocked
 {
   -fx-border-color: DARKRED !important;
-}
-.blocked
-{
-  /*
-  Show that content is declined.
-  */
+  -fx-background-color: rgba(255, 0, 0, 0.13);
 }

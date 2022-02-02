@@ -64,5 +64,5 @@
               text="Choose directory..." GridPane.columnIndex="3" GridPane.rowIndex="2" />
     </GridPane>
   </TitledPane>
-  <Button mnemonicParsing="false" text="Save Options" VBox.vgrow="NEVER" onAction="#saveOptions" />
+  <Button fx:id="saveButton" mnemonicParsing="false" text="Save Options" VBox.vgrow="NEVER" onAction="#saveOptions" />
 </VBox>

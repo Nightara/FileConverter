@@ -2,7 +2,6 @@ package de.dkfz.sbst.tichawa.util.converter;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
-import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.event.*;
 import javafx.fxml.*;
@@ -12,6 +11,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import lombok.*;
+import org.fxmisc.easybind.*;
 
 import java.io.*;
 import java.net.*;
@@ -24,7 +24,6 @@ import java.util.stream.*;
 @Getter(AccessLevel.PRIVATE)
 public class FileConverterController implements Initializable
 {
-  private final StringProperty status = new SimpleStringProperty("No configuration loaded.");
   private final ObjectProperty<Parser<String, String>> parser = new SimpleObjectProperty<>();
 
   private final Parser<String, String> defaultEnrollmentParser;
@@ -102,19 +101,24 @@ public class FileConverterController implements Initializable
   public void initialize(URL url, ResourceBundle resourceBundle)
   {
     dropArea.getStyleClass().add("dashed-border");
+    EasyBind.includeWhen(dropArea.getStyleClass(),"blocked", getParser().isNull());
+    EasyBind.includeWhen(dropArea.getStyleClass(),"highlight",getParser().isNotNull());
     dropArea.setOnDragEntered(dragEvent ->
     {
-      dropArea.getStyleClass().add(getParser().isNull().get() ? "blocked" : "highlight");
+      dropArea.getStyleClass().add("drag");
       dragEvent.consume();
     });
     dropArea.setOnDragExited(dragEvent ->
     {
-      dropArea.getStyleClass().remove(getParser().isNull().get() ? "blocked" : "highlight");
+      dropArea.getStyleClass().remove("drag");
       dragEvent.consume();
     });
     dropArea.setOnDragOver(dragEvent ->
     {
-      if(dragEvent.getDragboard().hasFiles() && getParser().getValue().isReady())
+      if(dragEvent.getDragboard().hasFiles() && EasyBind.monadic(parser)
+          .filter(Objects::nonNull)
+          .filter(Parser::isReady)
+          .isPresent())
       {
         dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
       }
@@ -156,10 +160,58 @@ public class FileConverterController implements Initializable
       dragEvent.consume();
     });
 
-    configLabel.textProperty().bind(Bindings.createStringBinding(() ->
-        "Configuration: " + (parser.isNull().get() ? "-/-" : parser.get().getName()), parser));
-    statusLabel.textProperty().bind(status);
+    configLabel.textProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .orElse("-/-")
+        .map(s -> "Configuration: " + s));
+    statusLabel.setText("No configuration loaded.");
     parser.addListener((obs, oldVal, newVal) -> updateParser(newVal));
+
+    String boldFont = "-fx-font-weight: bold;";
+    String normalFont = "-fx-font-weight: normal;";
+
+    loadEnrollment.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Enrollment"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
+
+    loadAnamnesis.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Anamnesis"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
+
+    loadQuestionnaire.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Questionnaire"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
+
+    loadMedication.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Medication"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
+
+    loadWeekly.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Weekly"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
+
+    loadMonthly.styleProperty().bind(EasyBind.monadic(parser)
+        .filter(Objects::nonNull)
+        .map(Parser::getName)
+        .filter("Monthly"::equals)
+        .map(n -> boldFont)
+        .orElse(normalFont));
   }
 
   @FXML
@@ -182,14 +234,13 @@ public class FileConverterController implements Initializable
         }
         stage.setTitle("File Converter");
 
-        ((SettingsController) loader.getController()).parserProperty().addListener((obs, oldVal, newVal) ->
-            getParser().set(newVal));
+        EasyBind.subscribe(((SettingsController) loader.getController()).parserProperty(), this::setParser);
         stage.showAndWait();
       }
     }
     catch(IOException ex)
     {
-      getParser().set(legacyLoadConfig(a).orElse(null));
+      setParser(legacyLoadConfig(a).orElse(null));
     }
   }
 
@@ -198,27 +249,31 @@ public class FileConverterController implements Initializable
   {
     if(a.getSource() == loadEnrollment)
     {
-      getParser().set(defaultEnrollmentParser);
+      setParser(defaultEnrollmentParser);
     }
     else if(a.getSource() == loadAnamnesis)
     {
-      getParser().set(defaultAnamnesisParser);
+      setParser(defaultAnamnesisParser);
     }
     else if(a.getSource() == loadQuestionnaire)
     {
-      getParser().set(defaultQuestionnaireParser);
+      setParser(defaultQuestionnaireParser);
     }
-      else if(a.getSource() == loadMedication)
+    else if(a.getSource() == loadMedication)
     {
-      getParser().set(defaultMedicationParser);
+      setParser(defaultMedicationParser);
     }
-      else if(a.getSource() == loadWeekly)
+    else if(a.getSource() == loadWeekly)
     {
-      getParser().set(defaultWeeklyParser);
+      setParser(defaultWeeklyParser);
     }
-      else if(a.getSource() == loadMonthly)
+    else if(a.getSource() == loadMonthly)
     {
-      getParser().set(defaultMonthlyParser);
+      setParser(defaultMonthlyParser);
+    }
+    else
+    {
+      setParser(null);
     }
   }
 
@@ -227,16 +282,16 @@ public class FileConverterController implements Initializable
     if(parser != null && parser.isReady())
     {
       getDropArea().getStyleClass().add("ready");
-      getStatus().set("Configuration \"" + parser.getName() + "\" loaded.");
+      getStatusLabel().setText("Configuration \"" + parser.getName() + "\" loaded.");
     }
     else
     {
       getDropArea().getStyleClass().remove("ready");
-      getStatus().set("Error in configuration file.");
+      getStatusLabel().setText("Error in configuration file.");
     }
 
-    new Alert(getStatus().get().contains("Error") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION,
-        getStatus().get()).showAndWait();
+    new Alert(getStatusLabel().getText().contains("Error") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION,
+        getStatusLabel().getText()).showAndWait();
   }
 
   @FXML
@@ -305,5 +360,10 @@ public class FileConverterController implements Initializable
     {
       return false;
     }
+  }
+
+  private void setParser(Parser<String, String> parser)
+  {
+    getParser().set(parser);
   }
 }
