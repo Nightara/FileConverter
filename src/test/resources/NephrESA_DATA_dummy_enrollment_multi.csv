@@ -1,0 +1,6 @@
+record_id;redcap_event_name;redcap_repeat_instrument;redcap_repeat_instance;redcap_data_access_group;patient_id;openbis_id;patient_type;gender_enroll;gender_divers_enroll;visit_date;consent_date;version_number;consent_data_protection;consent_data_other_counties;consent_biomaterial;consent_renewed_contact;questionnaire;questionnaire_date;comments;test_enrollment_and_consent_complete
+1;enrollment_arm_1;;;;N1-000;;1;2;;18.05.2021;11.05.2021;1;1;1;1;1;2;18.05.2021;;2
+2;enrollment_arm_1;;;;N1-001;;1;1;;19.05.2021;19.05.2021;1;1;1;1;1;2;19.05.2021;;2
+3;enrollment_arm_1;;;;N1-002;;2;1;;18.06.2021;18.06.2021;1;1;1;1;1;2;18.06.2021;;3
+4;enrollment_arm_1;;;;N1-003;;1;1;;01.01.2022;01.01.2022;1;1;1;1;1;2;01.01.2022;;1
+5;enrollment_arm_1;;;;N1-004;;1;3;nb;12.05.2021;12.05.2021;1;1;1;1;1;2;12.05.2021;;2
