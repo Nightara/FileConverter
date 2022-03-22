@@ -5,6 +5,14 @@ import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+ * The base interface of the converter library.
+ * TODO: Add explanation
+ *
+ * @param <I> The initial input type for the parser.
+ * @param <O> The final output type for the parser.
+ */
+@SuppressWarnings("unused")
 public interface Parser<I, O>
 {
   boolean configure(Configuration configuration, String... inHeaders);
