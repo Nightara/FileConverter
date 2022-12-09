@@ -16,7 +16,6 @@ public class SimpleStringParser implements Parser<String, String>
 {
   private static final Pattern INSTANT_PATTERN = Pattern.compile("^(\\d{4})-(\\d{2})-(\\d{2})" +
       "T(\\d{2}):(\\d{2}):(\\d{2})Z$");
-
   private final String name;
   private final Path outputPath;
   private final String inSeparator;

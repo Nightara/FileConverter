@@ -35,6 +35,7 @@ class SimpleRuleTest
   private static final SimpleRule<String, Instant> specialStringInstantRule = new SimpleRule<>("test_IN","test_OUT",
       DataType.STRING, DataType.INSTANT, Rule.Mode.SPECIAL,"NOW",null);
 
+  @SuppressWarnings("unused")
   static List<Arguments> generateTestSets()
   {
     List<Arguments> arguments = new LinkedList<>();
@@ -82,6 +83,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testCanApply(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -89,6 +91,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testApply(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -99,6 +102,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testApplyLabels(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -109,6 +113,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testCanReverse(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -116,6 +121,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testReverse(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -126,6 +132,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testReverseLabels(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
@@ -136,6 +143,7 @@ class SimpleRuleTest
   }
 
   @ParameterizedTest
+  @SuppressWarnings("unused")
   @MethodSource("generateTestSets")
   <I, O> void testApplyAndReverse(SimpleRule<I, O> rule, I input, O output, boolean canApply, boolean canReverse)
   {
