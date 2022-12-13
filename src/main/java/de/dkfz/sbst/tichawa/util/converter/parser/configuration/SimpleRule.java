@@ -43,7 +43,7 @@ public class SimpleRule<I, O> extends Rule<I, O>
       case REGEX:
         try
         {
-          return getPattern().matcher(getInVal().toString()).find();
+          return getPattern().matcher(value.toString()).find();
         }
         catch(PatternSyntaxException ex)
         {
