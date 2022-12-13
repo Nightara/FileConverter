@@ -202,7 +202,7 @@ public class Configuration
         {
           return (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
         }
-        else if(mode == Rule.Mode.REGEX || mode == Rule.Mode.REGEX_TRANSLATE)
+        else if(mode == Rule.Mode.REGEX || mode == Rule.Mode.REGEX_TRANSLATE || mode == Rule.Mode.REGEX_MULTI)
         {
           return (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
         }

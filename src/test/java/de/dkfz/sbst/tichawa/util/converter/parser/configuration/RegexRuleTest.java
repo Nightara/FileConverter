@@ -25,6 +25,9 @@ class RegexRuleTest
   private static final RegexRule<Double> regexTranslateDoubleRule = new RegexRule<>("test_IN","test_OUT",
       DataType.DOUBLE, Rule.Mode.REGEX_TRANSLATE,"^[0-4]$",0.0);
 
+  private static final RegexRule<String> multiRegexRule = new RegexRule<>("test_IN","test_OUT",
+      DataType.STRING, Rule.Mode.REGEX_MULTI,"([0-4])\\d([5-9])","1/2");
+
   @SuppressWarnings("unused")
   static List<Arguments> generateTestSets()
   {
@@ -45,6 +48,9 @@ class RegexRuleTest
     arguments.add(Arguments.of(regexTranslateWholeStringRule, "0", "low", true, false));
     arguments.add(Arguments.of(regexTranslateDoubleRule, "0", 0.0, true, false));
     arguments.add(Arguments.of(regexTranslateDoubleRule, "9", -1.0, false, false));
+
+    arguments.add(Arguments.of(multiRegexRule, "418", "48", true, false));
+    arguments.add(Arguments.of(multiRegexRule, "48", "", false, false));
 
     return arguments;
   }

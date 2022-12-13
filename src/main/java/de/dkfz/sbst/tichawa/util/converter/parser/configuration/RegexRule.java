@@ -10,6 +10,8 @@ import java.util.regex.*;
 @EqualsAndHashCode(callSuper=true)
 public class RegexRule<O> extends Rule<String, O>
 {
+  public static final String MULTI_REGEX_SEPARATOR = "/";
+
   private final Pattern pattern;
 
   public RegexRule(@NonNull String inLabel, @NonNull String outLabel, @NonNull DataType<O> outType, @NonNull Mode mode,
@@ -36,19 +38,37 @@ public class RegexRule<O> extends Rule<String, O>
       switch(getMode())
       {
         case REGEX:
-          String outVal = getOutVal().toString();
           try
           {
-            return new Result<>(getOutLabel(),this, (O) m.group(Integer.parseInt(outVal)));
+            return new Result<>(getOutLabel(),this, (O) m.group(Integer.parseInt(getOutVal().toString())));
           }
           catch(NumberFormatException ex)
           {
-            return new Result<>(getOutLabel(),this, (O) m.group(outVal));
+            return new Result<>(getOutLabel(),this, (O) m.group(getOutVal().toString()));
           }
           catch(IndexOutOfBoundsException | IllegalArgumentException ex)
           {
             return null;
           }
+        case REGEX_MULTI:
+          String[] groups = getOutVal().toString().split(MULTI_REGEX_SEPARATOR);
+          StringBuilder result = new StringBuilder();
+          for(String group : groups)
+          {
+            try
+            {
+              result.append(m.group(Integer.parseInt(group)));
+            }
+            catch(NumberFormatException ex)
+            {
+              result.append(m.group(group));
+            }
+            catch(IndexOutOfBoundsException | IllegalArgumentException ex)
+            {
+              return null;
+            }
+          }
+          return new Result<>(getOutLabel(),this, (O) result.toString());
         case REGEX_TRANSLATE:
           return new Result<>(getOutLabel(),this, getOutVal());
         default:
