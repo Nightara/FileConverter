@@ -7,7 +7,7 @@ import java.util.*;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access=AccessLevel.PROTECTED)
 public abstract class Rule<I, O>
 {
   @NonNull
@@ -58,7 +58,7 @@ public abstract class Rule<I, O>
 
   public enum Mode
   {
-    KEEP, TRANSLATE, STATIC, REGEX, SUM, SPECIAL;
+    KEEP, TRANSLATE, STATIC, REGEX, REGEX_TRANSLATE, SUM, SPECIAL;
 
     public static Optional<Mode> getMode(String name)
     {

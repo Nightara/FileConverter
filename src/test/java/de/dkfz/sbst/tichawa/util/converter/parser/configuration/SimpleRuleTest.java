@@ -35,15 +35,6 @@ class SimpleRuleTest
   private static final SimpleRule<String, Instant> specialStringInstantRule = new SimpleRule<>("test_IN","test_OUT",
       DataType.STRING, DataType.INSTANT, Rule.Mode.SPECIAL,"NOW",null);
 
-  private static final SimpleRule<String, String> regexMatchAllRule = new SimpleRule<>("test_IN","test_OUT",
-      DataType.STRING, DataType.STRING, Rule.Mode.REGEX,"\\d+","0");
-
-  private static final SimpleRule<String, String> regexMatchWholeStringRule = new SimpleRule<>("test_IN","test_OUT",
-      DataType.STRING, DataType.STRING, Rule.Mode.REGEX,"^\\d+$","0");
-
-  private static final SimpleRule<String, String> regexMatchLastDigitRule = new SimpleRule<>("test_IN","test_OUT",
-      DataType.STRING, DataType.STRING, Rule.Mode.REGEX,"\\d+(\\d)","1");
-
   @SuppressWarnings("unused")
   static List<Arguments> generateTestSets()
   {
@@ -87,13 +78,6 @@ class SimpleRuleTest
     arguments.add(Arguments.of(staticStringRule, "", "two", true, false));
     arguments.add(Arguments.of(staticIntegerRule, 0, 2, true, false));
     arguments.add(Arguments.of(staticIntegerRule, 1, 2, true, false));
-
-    arguments.add(Arguments.of(regexMatchAllRule, "100", "100", true, false));
-    arguments.add(Arguments.of(regexMatchAllRule, "a100b", "100", true, false));
-    arguments.add(Arguments.of(regexMatchLastDigitRule, "100", "0", true, false));
-    arguments.add(Arguments.of(regexMatchLastDigitRule, "a100b", "0", true, false));
-    arguments.add(Arguments.of(regexMatchWholeStringRule, "100", "100", true, false));
-    arguments.add(Arguments.of(regexMatchWholeStringRule, "a100b", "0", false, false));
 
     return arguments;
   }
