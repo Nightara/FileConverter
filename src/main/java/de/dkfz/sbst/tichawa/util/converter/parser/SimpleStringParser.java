@@ -101,11 +101,11 @@ public class SimpleStringParser implements Parser<String, String>
         .filter(Objects::nonNull)
         .map(Rule.Result::getData)
         .map(Object::toString)
-        .map(SimpleStringParser::fixEncoding)
+        .map(this::fixEncoding)
         .collect(Collectors.joining(getOutSeparator()));
   }
 
-  protected static String fixEncoding(String input)
+  protected String fixEncoding(String input)
   {
     Matcher instant = INSTANT_PATTERN.matcher(input);
     if(instant.matches())
