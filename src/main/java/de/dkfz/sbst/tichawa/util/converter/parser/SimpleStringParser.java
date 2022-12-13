@@ -105,7 +105,7 @@ public class SimpleStringParser implements Parser<String, String>
         .collect(Collectors.joining(getOutSeparator()));
   }
 
-  private static String fixEncoding(String input)
+  protected static String fixEncoding(String input)
   {
     Matcher instant = INSTANT_PATTERN.matcher(input);
     if(instant.matches())
