@@ -10,7 +10,7 @@ public class FilterRule<I, O> extends Rule<I, O>
 
   public FilterRule(Rule<I, O> innerRule)
   {
-    super(innerRule.getInLabel(), innerRule.getInLabel(), innerRule.getInType(), innerRule.getOutType(), Mode.FILTER,
+    super(innerRule.getInLabel(), innerRule.getOutLabel(), innerRule.getInType(), innerRule.getOutType(), Mode.FILTER,
         innerRule.getInVal(), innerRule.getOutVal());
     this.innerRule = innerRule;
   }
