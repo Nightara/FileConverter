@@ -13,6 +13,8 @@ import java.util.stream.*;
 @AllArgsConstructor(access=AccessLevel.PUBLIC)
 public class Configuration
 {
+  private static final String EPOCH = "EPOCH";
+
   private static final Map<DataType<?>, List<ConfigParser<?>>> PARSERS;
   private static final DateTimeFormatter EU_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -39,7 +41,7 @@ public class Configuration
               {
                 return null;
               }
-              else if(input.equals("EPOCH"))
+              else if(input.equals(EPOCH))
               {
                 return Instant.EPOCH;
               }
@@ -57,7 +59,7 @@ public class Configuration
               {
                 return null;
               }
-              else if(input.equals("EPOCH"))
+              else if(input.equals(EPOCH))
               {
                 return Instant.EPOCH;
               }
@@ -75,7 +77,7 @@ public class Configuration
               {
                 return null;
               }
-              else if(input.equals("EPOCH"))
+              else if(input.equals(EPOCH))
               {
                 return Instant.EPOCH;
               }
@@ -86,7 +88,7 @@ public class Configuration
                     .toInstant(ZoneOffset.UTC);
               }
             })));
-    PARSERS.put(DataType.LOCALDATE, Collections.singletonList(new ConfigParser<>(DataType.DURATION, input -> null)));
+    PARSERS.put(DataType.LOCAL_DATE, Collections.singletonList(new ConfigParser<>(DataType.DURATION, input -> null)));
     PARSERS.put(DataType.DURATION, Collections.singletonList(new ConfigParser<>(DataType.DURATION,
             input -> input.isBlank() ? null : Duration.parse(input))));
   }
@@ -145,6 +147,7 @@ public class Configuration
     return Optional.empty();
   }
 
+  @SuppressWarnings("ProtectedMemberInFinalClass")
   protected static boolean isValidRule(String line)
   {
     if(line == null)
@@ -157,18 +160,21 @@ public class Configuration
         && data.length == 7
         && DataType.getDataType(data[2]).isPresent()
         && DataType.getDataType(data[3]).isPresent()
-        && Rule.Mode.getMode(data[4]).isPresent();
+        && (Rule.Mode.getMode(data[4]).isPresent()
+          || (data[4].startsWith("FILTER/") && Rule.Mode.getMode(data[4].substring(7)).isPresent()));
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "ProtectedMemberInFinalClass"})
   protected static <K, G> Optional<Rule<K, G>> parseRule(String line)
   {
     try
     {
       String[] data = line.split("\t");
+      boolean filterMode = data[4].startsWith("FILTER/");
       DataType<K> inType = (DataType<K>) DataType.getDataType(data[2]).orElse(null);
       DataType<G> outType = (DataType<G>) DataType.getDataType(data[3]).orElse(null);
-      return Rule.Mode.getMode(data[4]).map(mode ->
+
+      return Rule.Mode.getMode(filterMode ? data[4].substring(7) : data[4]).map(mode ->
       {
         K inData = getParsers(inType).stream()
             .map(parser -> parser.tryApply(data[5]))
@@ -198,18 +204,22 @@ public class Configuration
           return null;
         }
 
+        Rule<K, G> rule;
         if(mode == Rule.Mode.SUM)
         {
-          return (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
+          rule = (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
         }
         else if(mode == Rule.Mode.REGEX || mode == Rule.Mode.REGEX_TRANSLATE || mode == Rule.Mode.REGEX_MULTI)
         {
-          return (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
+          //noinspection DataFlowIssue
+          rule = (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
         }
         else
         {
-          return new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);
+          rule = new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);
         }
+
+        return filterMode ? new FilterRule<>(rule) : rule;
       });
     }
     catch(Exception ex)
@@ -242,7 +252,7 @@ public class Configuration
     public static final DataType<Double> DOUBLE = new DataType<>(Double.class);
     public static final DataType<Boolean> BOOLEAN = new DataType<>(Boolean.class);
     public static final DataType<Instant> INSTANT = new DataType<>(Instant.class);
-    public static final DataType<LocalDate> LOCALDATE = new DataType<>(LocalDate.class);
+    public static final DataType<LocalDate> LOCAL_DATE = new DataType<>(LocalDate.class);
     public static final DataType<Duration> DURATION = new DataType<>(Duration.class);
 
     Class<T> clazz;

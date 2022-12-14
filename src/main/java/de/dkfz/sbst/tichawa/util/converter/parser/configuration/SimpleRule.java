@@ -25,7 +25,7 @@ public class SimpleRule<I, O> extends Rule<I, O>
     else
     {
       // Empty negative lookahead, always fails to match
-      pattern = Pattern.compile("(?!)");
+      pattern = Pattern.compile("(?!)"); // NOSONAR
     }
   }
 
@@ -44,8 +44,8 @@ public class SimpleRule<I, O> extends Rule<I, O>
       case SPECIAL:
         return (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
             || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && value instanceof Instant)
-            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCALDATE && getInVal() != null)
-            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCALDATE && value instanceof Instant);
+            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && getInVal() != null)
+            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && value instanceof Instant);
       default:
         return false;
     }
@@ -77,7 +77,7 @@ public class SimpleRule<I, O> extends Rule<I, O>
     {
       return new Result<>(getOutLabel(),this, (O) Instant.now());
     }
-    else if(getInType() == DataType.INSTANT && getOutType() == DataType.LOCALDATE)
+    else if(getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE)
     {
       return Optional.ofNullable(value)
           .or(() -> Optional.ofNullable(getInVal()))

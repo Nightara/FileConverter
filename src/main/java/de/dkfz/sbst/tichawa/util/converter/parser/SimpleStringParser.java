@@ -64,6 +64,28 @@ public class SimpleStringParser implements Parser<String, String>
         for(int x = 0; x < getInHeaders().size(); x++)
         {
           int finalX = x;
+
+          boolean filterStatus = getConfig().getRules().stream()
+              .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
+              .filter(rule -> rule.getInLabel().equals(getInHeaders().get(finalX)))
+              .anyMatch(rule -> Configuration.getParsers(rule.getInType()).stream()
+                  .map(parser ->
+                  {
+                    try
+                    {
+                      return parser.apply(strippedData.get(finalX));
+                    }
+                    catch(Exception ex)
+                    {
+                      return ex;
+                    }
+                  }).filter(obj -> !(obj instanceof Exception))
+                  .anyMatch(rule::canApply));
+          if(filterStatus)
+          {
+            return Collections.emptyMap();
+          }
+
           getConfig().getRules().stream()
               .filter(rule -> rule.getInLabel().equals(getInHeaders().get(finalX)))
               .map(rule -> Configuration.getParsers(rule.getInType()).stream()
