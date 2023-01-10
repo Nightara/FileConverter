@@ -38,4 +38,19 @@ public class FilterRule<I, O> extends Rule<I, O>
   {
     return null;
   }
+
+  @Value
+  @EqualsAndHashCode(callSuper=true)
+  public static class FilterException extends RuntimeException
+  {
+    Rule<?, ?> rule;
+    Object data;
+
+    public FilterException(Rule<?, ?> rule, Object data)
+    {
+      super("FilterRule " + rule + " applied to " + data);
+      this.rule = rule;
+      this.data = data;
+    }
+  }
 }

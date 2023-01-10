@@ -2,6 +2,7 @@ package de.dkfz.sbst.tichawa.util.converter.parser;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import lombok.*;
+import reactor.core.publisher.*;
 
 import java.nio.file.*;
 import java.util.*;
@@ -12,7 +13,7 @@ import java.util.stream.*;
 @With
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class SimpleStringParser implements Parser<String, String>
+public class SimpleStringParser implements ReactiveParser<String, String>
 {
   private static final Pattern INSTANT_PATTERN = Pattern.compile("^(\\d{4})-(\\d{2})-(\\d{2})" +
       "T(\\d{2}):(\\d{2}):(\\d{2})Z$");
@@ -51,9 +52,8 @@ public class SimpleStringParser implements Parser<String, String>
   }
 
   @Override
-  public Map<String, Rule.Result<Object>> parse(String input)
+  public Mono<Map<String, Rule.Result<Object>>> parseReactive(String input)
   {
-    Map<String, Rule.Result<Object>> output = new HashMap<>();
     if(isReady())
     {
       List<String> strippedData = Arrays.stream(input.split(getInSeparator()))
@@ -61,14 +61,16 @@ public class SimpleStringParser implements Parser<String, String>
           .collect(Collectors.toList());
       if(strippedData.size() >= getInHeaders().size())
       {
+        Map<String, Rule.Result<Object>> output = new HashMap<>();
+
         for(int x = 0; x < getInHeaders().size(); x++)
         {
           int finalX = x;
 
-          boolean filterStatus = getConfig().getRules().stream()
+          Optional<Rule<Object, Object>> filterStatus = getConfig().getRules().stream()
               .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
               .filter(rule -> rule.getInLabel().equals(getInHeaders().get(finalX)))
-              .anyMatch(rule -> Configuration.getParsers(rule.getInType()).stream()
+              .filter(rule -> Configuration.getParsers(rule.getInType()).stream()
                   .map(parser ->
                   {
                     try
@@ -80,10 +82,11 @@ public class SimpleStringParser implements Parser<String, String>
                       return ex;
                     }
                   }).filter(obj -> !(obj instanceof Exception))
-                  .anyMatch(rule::canApply));
-          if(filterStatus)
+                  .anyMatch(rule::canApply))
+              .findAny();
+          if(filterStatus.isPresent())
           {
-            return Collections.emptyMap();
+            return Mono.error(new FilterRule.FilterException(filterStatus.get(), input));
           }
 
           getConfig().getRules().stream()
@@ -109,10 +112,18 @@ public class SimpleStringParser implements Parser<String, String>
               .map(Optional::get)
               .forEach(result -> output.putIfAbsent(result.getLabel(), result));
         }
+
+        return Mono.just(output);
+      }
+      else
+      {
+        return Mono.error(new IllegalStateException("Input data shorter than expected."));
       }
     }
-
-    return output;
+    else
+    {
+      return Mono.error(new IllegalStateException("Parser is not ready."));
+    }
   }
 
   @Override
