@@ -11,6 +11,8 @@ public interface ReactiveParser<I, O> extends Parser<I, O>
 
   default Map<String, Rule.Result<Object>> parse(I input)
   {
-    return parseReactive(input).block();
+    return parseReactive(input)
+        .onErrorReturn(new HashMap<>())
+        .block();
   }
 }
