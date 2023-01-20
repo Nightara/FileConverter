@@ -113,7 +113,14 @@ public class SimpleStringParser implements ReactiveParser<String, String>
               .forEach(result -> output.putIfAbsent(result.getLabel(), result));
         }
 
-        return Mono.just(output);
+        if(output.isEmpty())
+        {
+          return Mono.error(new ParseException("Empty output data"));
+        }
+        else
+        {
+          return Mono.just(output);
+        }
       }
       else
       {
