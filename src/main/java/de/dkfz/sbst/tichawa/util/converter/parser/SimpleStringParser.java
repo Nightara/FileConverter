@@ -115,7 +115,7 @@ public class SimpleStringParser implements ReactiveParser<String, String>
 
         if(output.isEmpty())
         {
-          return Mono.error(new ParseException("Empty output data"));
+          return Mono.error(new ParseException("Empty output data", input));
         }
         else
         {
