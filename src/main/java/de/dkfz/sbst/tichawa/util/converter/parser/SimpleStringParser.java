@@ -160,9 +160,15 @@ public class SimpleStringParser implements ReactiveParser<String, String>
   }
 
   @Override
-  public String encodeHeader()
+  public List<String> getHeader()
   {
-    return getConfig().getOutLabels().stream()
+    return getConfig().getOutLabels();
+  }
+
+  @Override
+  public String encodeHeader(Collection<String> header)
+  {
+    return header.stream()
         .collect(Collectors.joining(getOutSeparator()));
   }
 }

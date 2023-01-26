@@ -25,7 +25,13 @@ public interface Parser<I, O>
 
   Map<String, Rule.Result<Object>> parse(I input);
   O encode(Map<String, Rule.Result<Object>> data);
-  O encodeHeader();
+  List<String> getHeader();
+  O encodeHeader(Collection<String> header);
+
+  default O encodeHeader()
+  {
+    return encodeHeader(getHeader());
+  }
 
   default O translate(I input)
   {
