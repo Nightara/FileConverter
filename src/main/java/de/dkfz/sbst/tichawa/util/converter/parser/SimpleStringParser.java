@@ -160,7 +160,7 @@ public class SimpleStringParser implements ReactiveParser<String, String>
   }
 
   @Override
-  public List<String> getHeader()
+  public List<String> getHeaders()
   {
     return getConfig().getOutLabels();
   }

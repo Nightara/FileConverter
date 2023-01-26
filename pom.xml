@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkfz.sbst.tichawa.util</groupId>
   <artifactId>file-converter</artifactId>
-  <version>1.4.2</version>
+  <version>1.4.3</version>
   <properties>
     <mainClass>de.dkfz.sbst.tichawa.util.converter.Launcher</mainClass>
     <shadeMainClass>de.dkfz.sbst.tichawa.util.converter.ShadeLauncher</shadeMainClass>
