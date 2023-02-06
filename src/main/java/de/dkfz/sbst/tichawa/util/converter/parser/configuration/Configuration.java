@@ -29,7 +29,7 @@ public class Configuration
     PARSERS.put(DataType.INTEGER, Collections.singletonList(new ConfigParser<>(DataType.INTEGER,
         input ->  input.isBlank() || input.equals("ND") ? null : Integer.parseInt(input))));
     PARSERS.put(DataType.DOUBLE, Collections.singletonList(new ConfigParser<>(DataType.DOUBLE,
-        input -> input.isBlank() || input.equals("ND") ? null : Double.parseDouble(input))));
+        input -> input.isBlank() || input.equals("ND") ? null : Double.parseDouble(input.replace(',','.')))));
     PARSERS.put(DataType.BOOLEAN, Arrays.asList(new ConfigParser<>(DataType.BOOLEAN, Boolean::parseBoolean),
         new ConfigParser<>(DataType.BOOLEAN,
             input -> input.isBlank() ? null : Integer.parseInt(input) != 0)));
