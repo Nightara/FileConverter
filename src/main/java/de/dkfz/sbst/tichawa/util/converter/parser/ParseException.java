@@ -4,11 +4,11 @@ import lombok.*;
 
 import java.io.*;
 
-@Value
+@Getter
 @EqualsAndHashCode(callSuper=true)
 public class ParseException extends IllegalArgumentException
 {
-  Serializable data;
+  private final Serializable data;
 
   public ParseException(String s, Serializable data)
   {

@@ -1,6 +1,9 @@
 package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 
+import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import lombok.*;
+
+import java.io.*;
 
 @EqualsAndHashCode(callSuper=true)
 public class FilterRule<I, O> extends Rule<I, O>
@@ -39,18 +42,17 @@ public class FilterRule<I, O> extends Rule<I, O>
     return null;
   }
 
-  @Value
+  @Getter
   @EqualsAndHashCode(callSuper=true)
-  public static class FilterException extends RuntimeException
+  @SuppressWarnings("java:S2166")
+  public static class FilterException extends ParseException
   {
-    Rule<?, ?> rule;
-    Object data;
+    private final Rule<?, ?> rule;
 
-    public FilterException(Rule<?, ?> rule, Object data)
+    public FilterException(Rule<?, ?> rule, Serializable data)
     {
-      super("FilterRule " + rule + " applied to " + data);
+      super("FilterRule " + rule + " applied.", data);
       this.rule = rule;
-      this.data = data;
     }
   }
 }
