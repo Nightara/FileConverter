@@ -56,7 +56,7 @@ public class SimpleStringParser implements ReactiveParser<String, String>
   {
     if(isReady())
     {
-      List<String> strippedData = Arrays.stream(input.split(getInSeparator()))
+      List<String> strippedData = Arrays.stream(input.split(getInSeparator(), -1))
           .map(line -> line.replace("\"", ""))
           .collect(Collectors.toList());
       if(strippedData.size() >= getInHeaders().size())
@@ -124,12 +124,12 @@ public class SimpleStringParser implements ReactiveParser<String, String>
       }
       else
       {
-        return Mono.error(new IllegalStateException("Input data shorter than expected."));
+        return Mono.error(new ParseException("Input data shorter than expected.", input));
       }
     }
     else
     {
-      return Mono.error(new IllegalStateException("Parser is not ready."));
+      return Mono.error(new ParseException("Parser is not ready.", input));
     }
   }
 
