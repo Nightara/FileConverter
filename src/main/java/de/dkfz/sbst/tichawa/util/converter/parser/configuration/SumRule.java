@@ -41,15 +41,14 @@ public class SumRule<I> extends SimpleRule<I, I>
   @SuppressWarnings("unchecked")
   public Result<I> apply(I value)
   {
+    if(value == null)
+    {
+      value = getDefaultVal();
+    }
     setStash(value);
 
     Result<I> result = null;
-    if(value == null)
-    {
-      getRuleGroup().forEach(SumRule::clearStash);
-      return new Result<>(getOutLabel(),this, getDefaultVal());
-    }
-    else if(isGroupFilled())
+    if(isGroupFilled())
     {
       if(value instanceof Number)
       {
