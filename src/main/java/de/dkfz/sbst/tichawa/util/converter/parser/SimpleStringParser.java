@@ -141,11 +141,11 @@ public class SimpleStringParser implements ReactiveParser<String, String>
         .filter(Objects::nonNull)
         .map(Rule.Result::data)
         .map(Object::toString)
-        .map(this::fixEncoding)
+        .map(this::format)
         .collect(Collectors.joining(getOutSeparator()));
   }
 
-  protected String fixEncoding(String input)
+  protected String format(String input)
   {
     Matcher instant = INSTANT_PATTERN.matcher(input);
     if(instant.matches())
