@@ -16,7 +16,6 @@ import org.fxmisc.easybind.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -144,7 +143,7 @@ public class FileConverterController implements Initializable
             .filter(e -> exportResult(innerParser.hasOutputPath() ?
                 innerParser.getOutputPath().resolve(e.getKey().getFileName()) : e.getKey(), e.getValue()))
             .map(e -> e.getValue().size())
-            .collect(Collectors.toList());
+            .toList();
 
         success = parsed.size() == lineCounts.size();
         new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR,
@@ -341,7 +340,7 @@ public class FileConverterController implements Initializable
       return Stream.concat(Stream.of(getParser().get().encodeHeader()), Files.lines(path)
           .skip(1)
           .map(getParser().get()::translate))
-          .collect(Collectors.toList());
+          .toList();
     }
     catch(IOException ex)
     {

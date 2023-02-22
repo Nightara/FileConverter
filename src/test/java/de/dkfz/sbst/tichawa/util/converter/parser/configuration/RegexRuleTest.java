@@ -70,7 +70,7 @@ class RegexRuleTest
   {
     if(canApply)
     {
-      Assertions.assertEquals(output, rule.apply(input).getData());
+      Assertions.assertEquals(output, rule.apply(input).data());
     }
   }
 
@@ -89,7 +89,7 @@ class RegexRuleTest
   {
     if(canReverse)
     {
-      Assertions.assertEquals(input, rule.reverse(output).getData());
+      Assertions.assertEquals(input, rule.reverse(output).data());
     }
   }
 }

@@ -11,7 +11,6 @@ import javafx.stage.*;
 import javafx.util.*;
 import lombok.*;
 import lombok.experimental.*;
-import org.fxmisc.easybind.*;
 
 import java.io.*;
 import java.net.*;

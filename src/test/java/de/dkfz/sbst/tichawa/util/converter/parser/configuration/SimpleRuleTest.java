@@ -97,7 +97,7 @@ class SimpleRuleTest
   {
     if(canApply)
     {
-      Assertions.assertEquals(output, rule.apply(input).getData());
+      Assertions.assertEquals(output, rule.apply(input).data());
     }
   }
 
@@ -108,7 +108,7 @@ class SimpleRuleTest
   {
     if(canApply)
     {
-      Assertions.assertEquals(rule.getOutLabel(), rule.apply(input).getRule().getOutLabel());
+      Assertions.assertEquals(rule.getOutLabel(), rule.apply(input).rule().getOutLabel());
     }
   }
 
@@ -127,7 +127,7 @@ class SimpleRuleTest
   {
     if(canReverse)
     {
-      Assertions.assertEquals(input, rule.reverse(output).getData());
+      Assertions.assertEquals(input, rule.reverse(output).data());
     }
   }
 
@@ -138,7 +138,7 @@ class SimpleRuleTest
   {
     if(canReverse)
     {
-      Assertions.assertEquals(rule.getOutLabel(), rule.reverse(output).getRule().getInLabel());
+      Assertions.assertEquals(rule.getOutLabel(), rule.reverse(output).rule().getInLabel());
     }
   }
 
@@ -150,7 +150,7 @@ class SimpleRuleTest
     if(canApply && canReverse)
     {
       Rule.Result<O> result = rule.apply(input);
-      Assertions.assertEquals(input, rule.reverse(result.getData()).getData());
+      Assertions.assertEquals(input, rule.reverse(result.data()).data());
     }
   }
 
@@ -164,7 +164,7 @@ class SimpleRuleTest
     Assertions.assertFalse(specialStringInstantRule.canReverse(Instant.now()));
 
     Instant slightlyBefore = Instant.now().minus(1, ChronoUnit.MILLIS);
-    Instant generatedTime = specialStringInstantRule.apply("").getData();
+    Instant generatedTime = specialStringInstantRule.apply("").data();
     Instant slightlyAfter = Instant.now().plus(1, ChronoUnit.MILLIS);
 
     Assertions.assertTrue(slightlyBefore.isBefore(generatedTime));

@@ -39,8 +39,8 @@ class SimpleStringParserTest
     Assertions.assertEquals(2, results.size());
     Assertions.assertTrue(results.containsKey("out_one"));
     Assertions.assertTrue(results.containsKey("out_two"));
-    Assertions.assertInstanceOf(Integer.class, results.get("out_one").getData());
-    Assertions.assertInstanceOf(String.class, results.get("out_two").getData());
+    Assertions.assertInstanceOf(Integer.class, results.get("out_one").data());
+    Assertions.assertInstanceOf(String.class, results.get("out_two").data());
   }
 
   @Test
@@ -52,7 +52,7 @@ class SimpleStringParserTest
     Assertions.assertEquals(CONFIG.getOutLabels().size(), output.length);
     for(int x = 0; x < output.length; x++)
     {
-      Assertions.assertEquals(results.get(CONFIG.getOutLabels().get(x)).getData().toString(), output[x]);
+      Assertions.assertEquals(results.get(CONFIG.getOutLabels().get(x)).data().toString(), output[x]);
     }
   }
 }

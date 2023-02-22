@@ -73,13 +73,8 @@ public abstract class Rule<I, O>
     return new Rule.Reverse<>(rule);
   }
 
-  @Value
-  public static class Result<K>
-  {
-    String label;
-    Rule<?, K> rule;
-    K data;
-  }
+  public record Result<K>(String label, Rule<?, K> rule, K data)
+  {}
 
   private static class Reverse<O, I> extends Rule<O, I>
   {

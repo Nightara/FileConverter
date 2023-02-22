@@ -9,9 +9,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-@Value
-@AllArgsConstructor(access=AccessLevel.PUBLIC)
-public class Configuration
+public record Configuration(List<Rule<Object, Object>> rules)
 {
   private static final String EPOCH = "EPOCH";
 
@@ -19,13 +17,11 @@ public class Configuration
   private static final DateTimeFormatter EU_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-  List<Rule<Object, Object>> rules;
-
   static
   {
     PARSERS = new HashMap<>();
     PARSERS.put(DataType.STRING, Collections.singletonList(new ConfigParser<>(DataType.STRING,
-        input -> input.replaceAll("\"", ""))));
+        input -> input.replace("\"", ""))));
     PARSERS.put(DataType.INTEGER, Collections.singletonList(new ConfigParser<>(DataType.INTEGER,
         input ->  input.isBlank() || input.equals("ND") ? null : Integer.parseInt(input))));
     PARSERS.put(DataType.DOUBLE, Collections.singletonList(new ConfigParser<>(DataType.DOUBLE,
@@ -95,10 +91,10 @@ public class Configuration
 
   public List<String> getOutLabels()
   {
-    return getRules().stream()
+    return rules().stream()
         .map(Rule::getOutLabel)
         .distinct()
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public static Optional<Configuration> fromFile(File f)
@@ -120,11 +116,11 @@ public class Configuration
       try(BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
       {
         List<Rule<Object, Object>> rules = reader.lines()
-          .filter(Configuration::isValidRule)
-          .map(Configuration::parseRule)
-          .filter(Optional::isPresent)
-          .map(Optional::get)
-          .collect(Collectors.toList());
+            .filter(Configuration::isValidRule)
+            .map(Configuration::parseRule)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
 
         Map<String, List<SumRule<Object>>> sumRules = rules.stream()
             .filter(SumRule.class::isInstance)
@@ -204,20 +200,12 @@ public class Configuration
           return null;
         }
 
-        Rule<K, G> rule;
-        if(mode == Rule.Mode.SUM)
+        Rule<K, G> rule = switch(mode)
         {
-          rule = (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
-        }
-        else if(mode == Rule.Mode.REGEX || mode == Rule.Mode.REGEX_TRANSLATE || mode == Rule.Mode.REGEX_MULTI)
-        {
-          //noinspection DataFlowIssue
-          rule = (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
-        }
-        else
-        {
-          rule = new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);
-        }
+          case SUM -> (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
+          case REGEX, REGEX_TRANSLATE, REGEX_MULTI -> (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
+          default -> new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);
+        };
 
         return filterMode ? new FilterRule<>(rule) : rule;
       });
@@ -278,24 +266,19 @@ public class Configuration
     }
   }
 
-  @Value
-  public static class ConfigParser<T> implements Function<String, T>
+  public record ConfigParser<T>(Configuration.DataType<T> dataType, Function<String, T> parser) implements Function<String, T>
   {
-
-    Configuration.DataType<T> dataType;
-    Function<String, T> parser;
-
     @Override
     public T apply(String s)
     {
-      return getParser().apply(s);
+      return parser().apply(s);
     }
 
     public Optional<T> tryApply(String s)
     {
       try
       {
-        return Optional.ofNullable(getParser().apply(s));
+        return Optional.ofNullable(parser().apply(s));
       }
       catch(Exception ex)
       {

@@ -4,7 +4,6 @@ import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
-import java.util.logging.*;
 
 @SuppressWarnings("unchecked")
 class FilterRuleTest

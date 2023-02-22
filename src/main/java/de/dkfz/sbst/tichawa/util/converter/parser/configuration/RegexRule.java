@@ -35,22 +35,25 @@ public class RegexRule<O> extends Rule<String, O>
     Matcher m = getPattern().matcher(value);
     if(m.find())
     {
-      switch(getMode())
+      return switch(getMode())
       {
-        case REGEX:
+        case REGEX ->
+        {
           try
           {
-            return new Result<>(getOutLabel(),this, (O) m.group(Integer.parseInt(getOutVal().toString())));
+            yield new Result<>(getOutLabel(), this, (O) m.group(Integer.parseInt(getOutVal().toString())));
           }
           catch(NumberFormatException ex)
           {
-            return new Result<>(getOutLabel(),this, (O) m.group(getOutVal().toString()));
+            yield new Result<>(getOutLabel(), this, (O) m.group(getOutVal().toString()));
           }
           catch(IndexOutOfBoundsException | IllegalArgumentException ex)
           {
-            return null;
+            yield null;
           }
-        case REGEX_MULTI:
+        }
+        case REGEX_MULTI ->
+        {
           String[] groups = getOutVal().toString().split(MULTI_REGEX_SEPARATOR);
           StringBuilder result = new StringBuilder();
           for(String group : groups)
@@ -65,15 +68,14 @@ public class RegexRule<O> extends Rule<String, O>
             }
             catch(IndexOutOfBoundsException | IllegalArgumentException ex)
             {
-              return null;
+              yield null;
             }
           }
-          return new Result<>(getOutLabel(),this, (O) result.toString());
-        case REGEX_TRANSLATE:
-          return new Result<>(getOutLabel(),this, getOutVal());
-        default:
-          return null;
-      }
+          yield new Result<>(getOutLabel(), this, (O) result.toString());
+        }
+        case REGEX_TRANSLATE -> new Result<>(getOutLabel(), this, getOutVal());
+        default -> null;
+      };
     }
     else
     {

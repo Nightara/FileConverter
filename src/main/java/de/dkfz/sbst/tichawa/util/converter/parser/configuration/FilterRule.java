@@ -5,10 +5,10 @@ import lombok.*;
 
 import java.io.*;
 
+@Value
 @EqualsAndHashCode(callSuper=true)
 public class FilterRule<I, O> extends Rule<I, O>
 {
-  @Getter
   Rule<I, O> innerRule;
 
   public FilterRule(Rule<I, O> innerRule)

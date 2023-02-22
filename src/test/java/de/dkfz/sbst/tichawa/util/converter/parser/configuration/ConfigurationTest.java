@@ -58,7 +58,7 @@ class ConfigurationTest
     long lineCount = new BufferedReader(new InputStreamReader(inputStream))
         .lines().count() - 1;
     Assertions.assertTrue(config.isPresent());
-    Assertions.assertEquals(lineCount, config.get().getRules().size());
+    Assertions.assertEquals(lineCount, config.get().rules().size());
   }
 
   @ParameterizedTest

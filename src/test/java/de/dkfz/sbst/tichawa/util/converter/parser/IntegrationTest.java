@@ -67,7 +67,7 @@ class IntegrationTest
     parser.parseHeaderLine(rawLabels).ifPresent(inHeaders -> parser.configure(config, inHeaders));
     Map<String, Rule.Result<Object>> results = parser.parse(rawData);
 
-    List<String> expectedLabels = config.getOutLabels();
+    List<String> expectedLabels = new LinkedList<>(config.getOutLabels());
     Collections.sort(expectedLabels);
     List<String> actualLabels = new LinkedList<>(results.keySet());
     Collections.sort(actualLabels);

@@ -76,9 +76,9 @@ class SumRuleTest
     int val2 = 3;
 
     Assertions.assertNull(integerRuleOne.apply(val1));
-    Assertions.assertEquals(integerRuleTwo.getDefaultVal() + val1 + val2, integerRuleTwo.apply(val2).getData());
+    Assertions.assertEquals(integerRuleTwo.getDefaultVal() + val1 + val2, integerRuleTwo.apply(val2).data());
     Assertions.assertNull(integerRuleTwo.apply(val2));
-    Assertions.assertEquals(integerRuleOne.getDefaultVal() + val1 + val2, integerRuleOne.apply(val1).getData());
+    Assertions.assertEquals(integerRuleOne.getDefaultVal() + val1 + val2, integerRuleOne.apply(val1).data());
     Assertions.assertNull(integerRuleOne.apply(val1));
 
     Instant val3 = Instant.now();
@@ -88,10 +88,10 @@ class SumRuleTest
 
     Assertions.assertNull(instantRuleOne.apply(val3));
     Assertions.assertEquals(instantRuleTwo.getDefaultVal().plus(val3Duration).plus(val4Duration),
-        instantRuleTwo.apply(val4).getData());
+        instantRuleTwo.apply(val4).data());
     Assertions.assertNull(instantRuleTwo.apply(val4));
     Assertions.assertEquals(instantRuleOne.getDefaultVal().plus(val3Duration).plus(val4Duration),
-        instantRuleOne.apply(val3).getData());
+        instantRuleOne.apply(val3).data());
     Assertions.assertNull(instantRuleOne.apply(val3));
   }
 

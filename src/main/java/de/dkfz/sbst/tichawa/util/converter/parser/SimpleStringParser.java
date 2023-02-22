@@ -58,69 +58,22 @@ public class SimpleStringParser implements ReactiveParser<String, String>
     {
       List<String> strippedData = Arrays.stream(input.split(getInSeparator(), -1))
           .map(line -> line.replace("\"", ""))
-          .collect(Collectors.toList());
+          .toList();
       if(strippedData.size() >= getInHeaders().size())
       {
         Map<String, Rule.Result<Object>> output = new HashMap<>();
-
         for(int x = 0; x < getInHeaders().size(); x++)
         {
-          int finalX = x;
-
-          Optional<Rule<Object, Object>> filterStatus = getConfig().getRules().stream()
-              .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
-              .filter(rule -> rule.getInLabel().equals(getInHeaders().get(finalX)))
-              .filter(rule -> Configuration.getParsers(rule.getInType()).stream()
-                  .map(parser ->
-                  {
-                    try
-                    {
-                      return parser.apply(strippedData.get(finalX));
-                    }
-                    catch(Exception ex)
-                    {
-                      return ex;
-                    }
-                  }).filter(obj -> !(obj instanceof Exception))
-                  .anyMatch(rule::canApply))
-              .findAny();
+          Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), strippedData.get(x));
           if(filterStatus.isPresent())
           {
             return Mono.error(new FilterRule.FilterException(filterStatus.get(), input));
           }
 
-          getConfig().getRules().stream()
-              .filter(rule -> rule.getInLabel().equals(getInHeaders().get(finalX)))
-              .map(rule -> Configuration.getParsers(rule.getInType()).stream()
-                  .map(parser ->
-                  {
-                    try
-                    {
-                      return parser.apply(strippedData.get(finalX));
-                    }
-                    catch(Exception ex)
-                    {
-                      return ex;
-                    }
-                  }).filter(obj -> !(obj instanceof Exception))
-                  .filter(rule::canApply)
-                  .map(rule::tryApply)
-                  .filter(Optional::isPresent)
-                  .map(Optional::get)
-                  .findFirst())
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .forEach(result -> output.putIfAbsent(result.getLabel(), result));
+          parseInto(getInHeaders().get(x), strippedData.get(x), output);
         }
 
-        if(output.isEmpty())
-        {
-          return Mono.error(new ParseException("Empty output data", input));
-        }
-        else
-        {
-          return Mono.just(output);
-        }
+        return output.isEmpty() ? Mono.error(new ParseException("Empty output data", input)) : Mono.just(output);
       }
       else
       {
@@ -133,13 +86,60 @@ public class SimpleStringParser implements ReactiveParser<String, String>
     }
   }
 
+  private void parseInto(String label, String data, Map<String, Rule.Result<Object>> output)
+  {
+    getConfig().rules().stream()
+        .filter(rule -> rule.getInLabel().equals(label))
+        .map(rule -> Configuration.getParsers(rule.getInType()).stream()
+            .map(parser ->
+            {
+              try
+              {
+                return parser.apply(data);
+              }
+              catch(Exception ex)
+              {
+                return ex;
+              }
+            }).filter(obj -> !(obj instanceof Exception))
+            .filter(rule::canApply)
+            .map(rule::tryApply)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst())
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(result -> output.putIfAbsent(result.label(), result));
+  }
+
+  private Optional<Rule<Object, Object>> getFilterStatus(String label, String data)
+  {
+    return getConfig().rules().stream()
+        .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
+        .filter(rule -> rule.getInLabel().equals(label))
+        .filter(rule -> Configuration.getParsers(rule.getInType()).stream()
+            .map(parser ->
+            {
+              try
+              {
+                return parser.apply(data);
+              }
+              catch(Exception ex)
+              {
+                return ex;
+              }
+            }).filter(obj -> !(obj instanceof Exception))
+            .anyMatch(rule::canApply))
+        .findAny();
+  }
+
   @Override
   public String encode(Map<String, Rule.Result<Object>> data)
   {
     return getConfig().getOutLabels().stream()
         .map(data::get)
         .filter(Objects::nonNull)
-        .map(Rule.Result::getData)
+        .map(Rule.Result::data)
         .map(Object::toString)
         .map(this::fixEncoding)
         .collect(Collectors.joining(getOutSeparator()));

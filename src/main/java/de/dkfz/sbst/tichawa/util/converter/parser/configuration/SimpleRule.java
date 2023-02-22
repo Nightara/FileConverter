@@ -32,42 +32,31 @@ public class SimpleRule<I, O> extends Rule<I, O>
   @Override
   public boolean canApply(I value)
   {
-    switch(getMode())
+    return switch(getMode())
     {
-      case KEEP:
-        return (value == null && getOutVal() != null)
-            || getOutType().getClazz().isInstance(value);
-      case TRANSLATE:
-        return getInVal().equals(value);
-      case STATIC:
-        return true;
-      case SPECIAL:
-        return (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
-            || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && value instanceof Instant)
-            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && getInVal() != null)
-            || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && value instanceof Instant);
-      default:
-        return false;
-    }
+      case KEEP -> (value == null && getOutVal() != null) || getOutType().getClazz().isInstance(value);
+      case TRANSLATE -> getInVal().equals(value);
+      case STATIC -> true;
+      case SPECIAL -> (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
+          || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && value instanceof Instant)
+          || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && getInVal() != null)
+          || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && value instanceof Instant);
+      default -> false;
+    };
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Result<O> apply(I value)
   {
-    switch(getMode())
-    {
-      case KEEP:
-        return new Result<>(getOutLabel(),this, value != null ? (O) value : getOutVal());
-      case TRANSLATE:
-        return getInVal().equals(value) ? new Result<>(getOutLabel(),this, getOutVal()) : null;
-      case STATIC:
-        return new Result<>(getOutLabel(),this, getOutVal());
-      case SPECIAL:
-        return applySpecialMode(value);
-      default:
-        return null;
-    }
+    return switch(getMode())
+        {
+          case KEEP -> new Result<>(getOutLabel(), this, value != null ? (O) value : getOutVal());
+          case TRANSLATE -> getInVal().equals(value) ? new Result<>(getOutLabel(), this, getOutVal()) : null;
+          case STATIC -> new Result<>(getOutLabel(), this, getOutVal());
+          case SPECIAL -> applySpecialMode(value);
+          default -> null;
+        };
   }
 
   @SuppressWarnings("unchecked")
@@ -106,33 +95,28 @@ public class SimpleRule<I, O> extends Rule<I, O>
   }
 
   @Override
+  @SuppressWarnings("DuplicateBranchesInSwitch")
   public boolean canReverse(O value)
   {
-    switch(getMode())
+    return switch(getMode())
     {
-      case KEEP:
-        return getInType().getClazz().isInstance(value);
-      case TRANSLATE:
-        return getOutVal().equals(value);
-      case STATIC:
-      case SPECIAL:
-      default:
-        return false;
-    }
+      case KEEP -> getInType().getClazz().isInstance(value);
+      case TRANSLATE -> getOutVal().equals(value);
+      case STATIC, SPECIAL -> false;
+      default -> false;
+    };
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Result<I> reverse(O value)
   {
-    switch(getMode())
+    return switch(getMode())
     {
-      case KEEP:
-        return new Result<>(getInLabel(), Rule.reverse(this), (I) value);
-      case TRANSLATE:
-        return getOutVal().equals(value) ? new Result<>(getInLabel(), Rule.reverse(this), getInVal()) : null;
-      default:
-        return null;
-    }
+      case KEEP -> new Result<>(getInLabel(), Rule.reverse(this), (I) value);
+      case TRANSLATE ->
+          getOutVal().equals(value) ? new Result<>(getInLabel(), Rule.reverse(this), getInVal()) : null;
+      default -> null;
+    };
   }
 }
