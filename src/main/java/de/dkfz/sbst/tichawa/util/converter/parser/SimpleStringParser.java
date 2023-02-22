@@ -77,7 +77,8 @@ public class SimpleStringParser implements ReactiveParser<String, String>
       }
       else
       {
-        return Mono.error(new ParseException("Input data shorter than expected.", input));
+        return Mono.error(new ParseException("Input data shorter than expected. Expected "
+            + getInHeaders().size() + ", but found " + strippedData.size(), input));
       }
     }
     else
