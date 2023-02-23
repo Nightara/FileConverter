@@ -1,6 +1,8 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
+import lombok.*;
+import lombok.experimental.Delegate;
 
 import java.nio.file.*;
 import java.util.*;
@@ -23,7 +25,7 @@ public interface Parser<I, O>
 
   Optional<String[]> parseHeaderLine(I input);
 
-  Map<String, Rule.Result<Object>> parse(I input);
+  ParsedLine parse(int lineNumber, I input);
   O encode(Map<String, Rule.Result<Object>> data);
   List<String> getHeaders();
   O encodeHeader(Collection<String> header);
@@ -31,6 +33,11 @@ public interface Parser<I, O>
   default O encodeHeader()
   {
     return encodeHeader(getHeaders());
+  }
+
+  default ParsedLine parse(I input)
+  {
+    return parse(0, input);
   }
 
   default O translate(I input)
@@ -41,5 +48,14 @@ public interface Parser<I, O>
   default boolean hasOutputPath()
   {
     return getOutputPath() != null;
+  }
+
+  @Value
+  class ParsedLine implements Map<String, Rule.Result<Object>>
+  {
+    int lineNumber;
+    @Delegate
+    @Getter(AccessLevel.NONE)
+    Map<String, Rule.Result<Object>> innerMap;
   }
 }

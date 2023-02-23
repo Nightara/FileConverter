@@ -52,7 +52,7 @@ public class SimpleStringParser implements ReactiveParser<String, String>
   }
 
   @Override
-  public Mono<Map<String, Rule.Result<Object>>> parseReactive(String input)
+  public Mono<ParsedLine> parseReactive(int lineNumber, String input)
   {
     if(isReady())
     {
@@ -67,23 +67,23 @@ public class SimpleStringParser implements ReactiveParser<String, String>
           Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), strippedData.get(x));
           if(filterStatus.isPresent())
           {
-            return Mono.error(new FilterRule.FilterException(filterStatus.get(), input));
+            return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, input));
           }
 
           parseInto(getInHeaders().get(x), strippedData.get(x), output);
         }
 
-        return output.isEmpty() ? Mono.error(new ParseException("Empty output data", input)) : Mono.just(output);
+        return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, input)) : Mono.just(new ParsedLine(lineNumber, output));
       }
       else
       {
         return Mono.error(new ParseException("Input data shorter than expected. Expected "
-            + getInHeaders().size() + ", but found " + strippedData.size(), input));
+            + getInHeaders().size() + " elements, but found " + strippedData.size(), lineNumber, input));
       }
     }
     else
     {
-      return Mono.error(new ParseException("Parser is not ready.", input));
+      return Mono.error(new ParseException("Parser is not ready.", lineNumber, input));
     }
   }
 

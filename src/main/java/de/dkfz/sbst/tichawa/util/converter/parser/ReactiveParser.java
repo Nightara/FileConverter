@@ -7,12 +7,12 @@ import java.util.*;
 
 public interface ReactiveParser<I, O> extends Parser<I, O>
 {
-  Mono<Map<String, Rule.Result<Object>>> parseReactive(I input);
+  Mono<ParsedLine> parseReactive(int lineNumber, I input);
 
-  default Map<String, Rule.Result<Object>> parse(I input)
+  default ParsedLine parse(int lineNumber, I input)
   {
-    return parseReactive(input)
-        .onErrorReturn(new HashMap<>())
+    return parseReactive(lineNumber, input)
+        .onErrorReturn(new ParsedLine(0, new HashMap<>()))
         .block();
   }
 }

@@ -49,9 +49,9 @@ public class FilterRule<I, O> extends Rule<I, O>
   {
     private final Rule<?, ?> rule;
 
-    public FilterException(Rule<?, ?> rule, Serializable data)
+    public FilterException(Rule<?, ?> rule, int lineNumber, Serializable data)
     {
-      super("FilterRule " + rule + " applied.", data);
+      super("FilterRule " + rule + " applied.", lineNumber, data);
       this.rule = rule;
     }
   }
