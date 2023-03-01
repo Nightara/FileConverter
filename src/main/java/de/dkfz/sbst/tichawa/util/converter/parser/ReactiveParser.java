@@ -1,6 +1,5 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
-import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import reactor.core.publisher.*;
 
 import java.util.*;
