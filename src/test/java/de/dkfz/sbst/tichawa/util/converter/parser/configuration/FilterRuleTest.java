@@ -21,8 +21,8 @@ class FilterRuleTest
     RULES.add((Rule<Object, Object>) new FilterRule<>(FIRST_RULE));
   }
   private static final Configuration CONFIG = new Configuration(RULES);
-  private static final SimpleStringParser PARSER = new SimpleStringParser("Custom",null,
-      "\t","\n", CONFIG, Arrays.asList("in_one", "in_two"));
+  private static final SimpleStringParser PARSER = new SimpleStringParser("Custom",null, CONFIG,
+      "\t","\n","in_one", "in_two");
 
   @Test
   void testParse()
