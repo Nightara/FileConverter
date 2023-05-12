@@ -55,7 +55,7 @@ public class SimpleStringParser extends ReactiveParser<String, String>
         Map<String, Rule.Result<Object>> output = new HashMap<>();
         for(int x = 0; x < getInHeaders().size(); x++)
         {
-          Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), strippedData.get(x));
+          Optional<Rule<Object, Object>> filterStatus = parseAndGetFilterStatus(getInHeaders().get(x), strippedData.get(x));
           if(filterStatus.isPresent())
           {
             return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, input));

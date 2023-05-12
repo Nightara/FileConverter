@@ -34,7 +34,10 @@ public class SimpleRule<I, O> extends Rule<I, O>
   {
     return switch(getMode())
     {
-      case KEEP -> (value == null && getOutVal() != null) || getOutType().getClazz().isInstance(value);
+      case KEEP -> (value == null && getOutVal() != null)
+          || (getOutType() == DataType.INTEGER && value instanceof Number)
+          || (getOutType() == DataType.DOUBLE && value instanceof Number)
+          || getOutType().getClazz().isInstance(value);
       case TRANSLATE -> getInVal().equals(value);
       case STATIC -> true;
       case SPECIAL -> (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))

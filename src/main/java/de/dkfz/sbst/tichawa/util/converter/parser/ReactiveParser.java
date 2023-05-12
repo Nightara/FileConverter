@@ -53,7 +53,8 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
         .block();
   }
 
-  protected Optional<Rule<Object, Object>> getFilterStatus(String label, String data)
+  // TODO: Combine with getFilterStatus
+  protected Optional<Rule<Object, Object>> parseAndGetFilterStatus(String label, String data)
   {
     return getConfig().rules().stream()
         .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
@@ -74,6 +75,16 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
         .findAny();
   }
 
+  protected Optional<Rule<Object, Object>> getFilterStatus(String label, Object data)
+  {
+    return getConfig().rules().stream()
+        .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
+        .filter(rule -> rule.getInLabel().equals(label))
+        .filter(rule -> rule.canApply(data))
+        .findAny();
+  }
+
+  // TODO: Combine with translateInto
   protected void parseInto(String label, String data, Map<String, Rule.Result<Object>> output)
   {
     getConfig().rules().stream()
@@ -95,6 +106,17 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst())
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(result -> output.putIfAbsent(result.label(), result));
+  }
+
+  protected void translateInto(String label, Object data, Map<String, Rule.Result<Object>> output)
+  {
+    getConfig().rules().stream()
+        .filter(rule -> rule.getInLabel().equals(label))
+        .filter(rule -> rule.canApply(data))
+        .map(rule -> rule.tryApply(data))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .forEach(result -> output.putIfAbsent(result.label(), result));

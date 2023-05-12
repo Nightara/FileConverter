@@ -3,12 +3,13 @@ package de.dkfz.sbst.tichawa.util.converter.parser;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import lombok.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import reactor.core.publisher.*;
 
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.time.*;
 import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 // TODO: Write Unit Tests
 @Value
@@ -35,6 +36,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
   {
     return Optional.of(StreamSupport.stream(input.spliterator(),false)
         .map(ExcelParser::getCellContent)
+        .map(Object::toString)
         .toArray(String[]::new));
   }
 
@@ -46,9 +48,32 @@ public class ExcelParser extends ReactiveParser<Row, Row>
     for(int x = 0; x < labels.size(); x++)
     {
       String label = labels.get(x);
-      if(data.containsKey(label))
+      Cell cell = output.createCell(x);
+      Rule.Result<Object> value = data.get(label);
+      if(value.rule().getOutType().equals(Configuration.DataType.STRING))
       {
-        output.createCell(x).setCellValue(format(data.get(label).data().toString()));
+        cell.setCellValue(format((String) value.data()));
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.BOOLEAN))
+      {
+        cell.setCellValue((Boolean) value.data());
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.INTEGER)
+          || value.rule().getOutType().equals(Configuration.DataType.DOUBLE))
+      {
+        cell.setCellValue((Double) value.data());
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.INSTANT))
+      {
+        cell.setCellValue(Date.from((Instant) value.data()));
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.LOCAL_DATE))
+      {
+        cell.setCellValue((LocalDate) value.data());
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.DURATION))
+      {
+        cell.setCellValue(LocalDate.EPOCH.plus((Duration) value.data()));
       }
     }
 
@@ -78,15 +103,13 @@ public class ExcelParser extends ReactiveParser<Row, Row>
         Map<String, Rule.Result<Object>> output = new HashMap<>();
         for(int x = 0; x < getInHeaders().size(); x++)
         {
-          // TODO: Rewrite using cell types.
           Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), getCellContent(input.getCell(x)));
           if(filterStatus.isPresent())
           {
             return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, serialize(input)));
           }
 
-          // TODO: Rewrite using cell types.
-          parseInto(getInHeaders().get(x), getCellContent(input.getCell(x)), output);
+          translateInto(getInHeaders().get(x), getCellContent(input.getCell(x)), output);
         }
 
         return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, serialize(input))) : Mono.just(new ParsedLine(lineNumber, output));
@@ -103,13 +126,13 @@ public class ExcelParser extends ReactiveParser<Row, Row>
     }
   }
 
-  private static String getCellContent(Cell cell)
+  private static Object getCellContent(Cell cell)
   {
     return switch(cell.getCellType())
     {
       case _NONE, BLANK, ERROR -> "";
-      case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-      case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+      case BOOLEAN -> cell.getBooleanCellValue();
+      case NUMERIC -> cell.getNumericCellValue();
       case STRING -> cell.getStringCellValue();
       case FORMULA -> cell.getCellFormula();
     };
@@ -119,6 +142,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
   {
     return StreamSupport.stream(input.spliterator(),false)
         .map(ExcelParser::getCellContent)
+        .map(Object::toString)
         .toArray(String[]::new);
   }
 }
