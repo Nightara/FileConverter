@@ -103,13 +103,13 @@ public class ExcelParser extends ReactiveParser<Row, Row>
         Map<String, Rule.Result<Object>> output = new HashMap<>();
         for(int x = 0; x < getInHeaders().size(); x++)
         {
-          Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), getCellContent(input.getCell(x)));
+          Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), getCellContent(input.getCell(x)),true);
           if(filterStatus.isPresent())
           {
             return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, serialize(input)));
           }
 
-          translateInto(getInHeaders().get(x), getCellContent(input.getCell(x)), output);
+          mapInto(getInHeaders().get(x), getCellContent(input.getCell(x)), output,true);
         }
 
         return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, serialize(input))) : Mono.just(new ParsedLine(lineNumber, output));

@@ -1,14 +1,14 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
-import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration;
-import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Rule;
+import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import lombok.*;
 import reactor.core.publisher.*;
 
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.*;
+import java.util.stream.*;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +23,14 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
 
   private Configuration config;
   private List<String> inHeaders = Collections.emptyList();
+
+  private record Tuple<T1, T2>(T1 t1, T2 t2)
+  {
+    public static <T1, T2> Tuple<T1, T2> of(T1 t1, T2 t2)
+    {
+      return new Tuple<>(t1, t2);
+    }
+  }
 
   @Override
   public boolean configure(Configuration config, String... inHeaders)
@@ -53,73 +61,48 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
         .block();
   }
 
-  // TODO: Combine with getFilterStatus
-  protected Optional<Rule<Object, Object>> parseAndGetFilterStatus(String label, String data)
+  protected Optional<Rule<Object, Object>> getFilterStatus(String label, Object data, boolean parsed)
   {
     return getConfig().rules().stream()
         .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
         .filter(rule -> rule.getInLabel().equals(label))
-        .filter(rule -> Configuration.getParsers(rule.getInType()).stream()
-            .map(parser ->
-            {
-              try
-              {
-                return parser.apply(data);
-              }
-              catch(Exception ex)
-              {
-                return ex;
-              }
-            }).filter(obj -> !(obj instanceof Exception))
-            .anyMatch(rule::canApply))
+        .filter(rule -> parsed ? rule.canApply(data) : tryParsers(data, rule).anyMatch(rule::canApply))
         .findAny();
   }
 
-  protected Optional<Rule<Object, Object>> getFilterStatus(String label, Object data)
-  {
-    return getConfig().rules().stream()
-        .filter(rule -> rule.getMode() == Rule.Mode.FILTER)
-        .filter(rule -> rule.getInLabel().equals(label))
-        .filter(rule -> rule.canApply(data))
-        .findAny();
-  }
-
-  // TODO: Combine with translateInto
-  protected void parseInto(String label, String data, Map<String, Rule.Result<Object>> output)
+  protected void mapInto(String label, Object data, Map<String, Rule.Result<Object>> output, boolean parsed)
   {
     getConfig().rules().stream()
         .filter(rule -> rule.getInLabel().equals(label))
-        .map(rule -> Configuration.getParsers(rule.getInType()).stream()
-            .map(parser ->
-            {
-              try
-              {
-                return parser.apply(data);
-              }
-              catch(Exception ex)
-              {
-                return ex;
-              }
-            }).filter(obj -> !(obj instanceof Exception))
-            .filter(rule::canApply)
-            .map(rule::tryApply)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst())
+        .map(rule -> Tuple.of(rule, parsed ? data : getFirst(tryParsers(data, rule))))
+        .filter(tuple -> tuple.t1().canApply(tuple.t2()))
+        .map(tuple -> tuple.t1().tryApply(tuple.t2()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .forEach(result -> output.putIfAbsent(result.label(), result));
   }
 
-  protected void translateInto(String label, Object data, Map<String, Rule.Result<Object>> output)
+  private static <T> T getFirst(Stream<T> stream)
   {
-    getConfig().rules().stream()
-        .filter(rule -> rule.getInLabel().equals(label))
-        .filter(rule -> rule.canApply(data))
-        .map(rule -> rule.tryApply(data))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .forEach(result -> output.putIfAbsent(result.label(), result));
+    AtomicReference<T> object = new AtomicReference<>();
+    stream.limit(1).forEach(object::set);
+    return object.get();
+  }
+
+  private static Stream<Object> tryParsers(Object data, Rule<Object, Object> rule)
+  {
+    return Configuration.getParsers(rule.getInType()).stream()
+        .map(parser ->
+        {
+          try
+          {
+            return parser.apply(data.toString());
+          }
+          catch(Exception ex)
+          {
+            return ex;
+          }
+        }).filter(obj -> !(obj instanceof Exception));
   }
 
   protected String format(String input)

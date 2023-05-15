@@ -1,10 +1,13 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -47,7 +50,7 @@ class IntegrationTest
       .orElse(new Configuration(new LinkedList<>()));
 
   @SuppressWarnings("unused")
-  private static Stream<Arguments> generateTestSets()
+  private static Stream<Arguments> generateStringTestSets()
   {
     return Stream.of(
         Arguments.of(PATIENT_CONFIG, PATIENT_DATA, PATIENT_LABELS, "\t", "\t"),
@@ -59,12 +62,89 @@ class IntegrationTest
     );
   }
 
+  // TODO: Add test cases
+  @SuppressWarnings("unused")
+  private static Stream<Arguments> generateExcelTestSets()
+  {
+    Workbook cache = new XSSFWorkbook();
+    Sheet cacheSheet = cache.createSheet();
+    Row header = cacheSheet.createRow(cacheSheet.getLastRowNum() + 1);
+    header.createCell(0, CellType.STRING).setCellValue("record_id");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("redcap_event_name");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("redcap_repeat_instrument");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("redcap_repeat_instance");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("redcap_data_access_group");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("patient_id");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("openbis_id");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("patient_type");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("gender_enroll");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("gender_divers_enroll");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("visit_date");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("consent_date");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("version_number");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("consent_data_protection");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("consent_data_other_counties");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("consent_biomaterial");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("consent_renewed_contact");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("questionnaire");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("questionnaire_date");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("comments");
+    header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("test_enrollment_and_consent_complete");
+
+    // TODO: Fix date fields.
+    Row data = cacheSheet.createRow(cacheSheet.getLastRowNum() + 1);
+    data.createCell(0, CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue("enrollment_arm_1");
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue("N1-000");
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(2);
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue(LocalDate.of(2021,5,18));
+    data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue(LocalDate.of(2021,5,11));
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(1);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(2);
+    data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue(LocalDate.of(2021,5,18));
+    data.createCell(data.getLastCellNum(), CellType.BLANK);
+    data.createCell(data.getLastCellNum(), CellType.NUMERIC).setCellValue(2);
+
+    return Stream.of(
+        Arguments.of(PATIENT_CONFIG, data, header)
+    );
+  }
+
   @ParameterizedTest
-  @MethodSource("generateTestSets")
-  void parseData(Configuration config, String rawData, String rawLabels, String dataSeparator, String rawSeparator)
+  @MethodSource("generateStringTestSets")
+  void parseStringData(Configuration config, String rawData, String rawLabels, String dataSeparator, String rawSeparator)
   {
     SimpleStringParser parser = new SimpleStringParser("Custom",null, dataSeparator, rawSeparator);
     parser.parseHeaderLine(rawLabels).ifPresent(inHeaders -> parser.configure(config, inHeaders));
+    Map<String, Rule.Result<Object>> results = parser.parse(rawData);
+
+    List<String> expectedLabels = new LinkedList<>(config.getOutLabels());
+    Collections.sort(expectedLabels);
+    List<String> actualLabels = new LinkedList<>(results.keySet());
+    Collections.sort(actualLabels);
+
+    Assertions.assertLinesMatch(expectedLabels, actualLabels);
+
+    System.out.println(parser.encodeHeader());
+    System.out.println(parser.encode(results));
+  }
+
+  @ParameterizedTest
+  @MethodSource("generateExcelTestSets")
+  void parseExcelData(Configuration config, Row rawData, Row header)
+  {
+    ExcelParser parser = new ExcelParser("Custom",null);
+    parser.parseHeaderLine(header).ifPresent(inHeaders -> parser.configure(config, inHeaders));
     Map<String, Rule.Result<Object>> results = parser.parse(rawData);
 
     List<String> expectedLabels = new LinkedList<>(config.getOutLabels());

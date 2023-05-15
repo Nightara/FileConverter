@@ -1,5 +1,6 @@
 package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 
+import com.sun.prism.PixelFormat;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
 import lombok.*;
 
@@ -37,8 +38,11 @@ public class SimpleRule<I, O> extends Rule<I, O>
       case KEEP -> (value == null && getOutVal() != null)
           || (getOutType() == DataType.INTEGER && value instanceof Number)
           || (getOutType() == DataType.DOUBLE && value instanceof Number)
+          || getOutType() == DataType.STRING
           || getOutType().getClazz().isInstance(value);
-      case TRANSLATE -> getInVal().equals(value);
+      case TRANSLATE -> getInVal().equals(value)
+          || (getInType() == DataType.INTEGER && value instanceof Number number
+              && number.doubleValue() == ((Number) getInVal()).doubleValue());
       case STATIC -> true;
       case SPECIAL -> (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
           || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && value instanceof Instant)
@@ -55,7 +59,10 @@ public class SimpleRule<I, O> extends Rule<I, O>
     return switch(getMode())
         {
           case KEEP -> new Result<>(getOutLabel(), this, value != null ? (O) value : getOutVal());
-          case TRANSLATE -> getInVal().equals(value) ? new Result<>(getOutLabel(), this, getOutVal()) : null;
+          case TRANSLATE -> getInVal().equals(value)
+              || (getInType() == DataType.INTEGER && value instanceof Number number
+                  && number.doubleValue() == ((Number) getInVal()).doubleValue())
+              ? new Result<>(getOutLabel(), this, getOutVal()) : null;
           case STATIC -> new Result<>(getOutLabel(), this, getOutVal());
           case SPECIAL -> applySpecialMode(value);
           default -> null;

@@ -55,13 +55,13 @@ public class SimpleStringParser extends ReactiveParser<String, String>
         Map<String, Rule.Result<Object>> output = new HashMap<>();
         for(int x = 0; x < getInHeaders().size(); x++)
         {
-          Optional<Rule<Object, Object>> filterStatus = parseAndGetFilterStatus(getInHeaders().get(x), strippedData.get(x));
+          Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), strippedData.get(x),false);
           if(filterStatus.isPresent())
           {
             return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, input));
           }
 
-          parseInto(getInHeaders().get(x), strippedData.get(x), output);
+          mapInto(getInHeaders().get(x), strippedData.get(x), output,false);
         }
 
         return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, input)) : Mono.just(new ParsedLine(lineNumber, output));
