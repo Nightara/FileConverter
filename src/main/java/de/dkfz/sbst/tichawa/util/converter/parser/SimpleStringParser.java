@@ -8,12 +8,12 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.*;
 
-@Value
+@Getter
 @EqualsAndHashCode(callSuper=true)
 public class SimpleStringParser extends ReactiveParser<String, String>
 {
-  String inSeparator;
-  String outSeparator;
+  private final String inSeparator;
+  private final String outSeparator;
 
   public SimpleStringParser(String name, Path outputPath, String inSeparator, String outSeparator)
   {

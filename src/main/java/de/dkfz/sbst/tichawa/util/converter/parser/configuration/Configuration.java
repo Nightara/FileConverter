@@ -203,7 +203,8 @@ public record Configuration(List<Rule<Object, Object>> rules)
         Rule<K, G> rule = switch(mode)
         {
           case SUM -> (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
-          case REGEX, REGEX_TRANSLATE, REGEX_MULTI -> (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
+          case REGEX, REGEX_TRANSLATE, REGEX_REPLACE, REGEX_MULTI ->
+              (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
           default -> new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);
         };
 

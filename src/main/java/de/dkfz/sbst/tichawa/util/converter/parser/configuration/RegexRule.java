@@ -73,6 +73,7 @@ public class RegexRule<O> extends Rule<String, O>
           }
           yield new Result<>(getOutLabel(), this, (O) result.toString());
         }
+        case REGEX_REPLACE -> new Result<>(getOutLabel(), this, (O) m.replaceAll(getOutVal().toString()));
         case REGEX_TRANSLATE -> new Result<>(getOutLabel(), this, getOutVal());
         default -> null;
       };

@@ -1,6 +1,5 @@
 package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 
-import com.sun.prism.PixelFormat;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
 import lombok.*;
 

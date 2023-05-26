@@ -58,7 +58,7 @@ public abstract class Rule<I, O>
 
   public enum Mode
   {
-    KEEP, TRANSLATE, STATIC, REGEX, REGEX_MULTI, REGEX_TRANSLATE, SUM, SPECIAL, FILTER;
+    KEEP, TRANSLATE, STATIC, REGEX, REGEX_MULTI, REGEX_TRANSLATE, REGEX_REPLACE, SUM, SPECIAL, FILTER;
 
     public static Optional<Mode> getMode(String name)
     {

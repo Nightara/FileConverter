@@ -28,6 +28,13 @@ class RegexRuleTest
   private static final RegexRule<String> multiRegexRule = new RegexRule<>("test_IN","test_OUT",
       DataType.STRING, Rule.Mode.REGEX_MULTI,"([0-4])\\d([5-9])","1/2");
 
+  private static final RegexRule<String> regexReplaceRule = new RegexRule<>("test_IN","test_OUT",
+      DataType.STRING, Rule.Mode.REGEX_REPLACE,"[a-z]+","A");
+  private static final RegexRule<String> regexReplaceLookaheadRule = new RegexRule<>("test_IN",
+      "test_OUT", DataType.STRING, Rule.Mode.REGEX_REPLACE,"[a-z]+(?=\\d)","A");
+  private static final RegexRule<String> regexReplaceLookaheadRuleTwo = new RegexRule<>("test_IN",
+      "test_OUT", DataType.STRING, Rule.Mode.REGEX_REPLACE,"^(?=\\d{2}$)","N-0");
+
   @SuppressWarnings("unused")
   static List<Arguments> generateTestSets()
   {
@@ -51,6 +58,14 @@ class RegexRuleTest
 
     arguments.add(Arguments.of(multiRegexRule, "418", "48", true, false));
     arguments.add(Arguments.of(multiRegexRule, "48", "", false, false));
+
+    arguments.add(Arguments.of(regexReplaceRule, "100", "100", false, false));
+    arguments.add(Arguments.of(regexReplaceRule, "a100", "A100", true, false));
+    arguments.add(Arguments.of(regexReplaceRule, "ab100a", "A100A", true, false));
+    arguments.add(Arguments.of(regexReplaceLookaheadRule, "100", "100", false, false));
+    arguments.add(Arguments.of(regexReplaceLookaheadRule, "a100", "A100", true, false));
+    arguments.add(Arguments.of(regexReplaceLookaheadRule, "ab100a", "A100a", true, false));
+    arguments.add(Arguments.of(regexReplaceLookaheadRuleTwo, "01", "N-001", true, false));
 
     return arguments;
   }
