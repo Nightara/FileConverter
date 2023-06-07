@@ -91,7 +91,7 @@ class IntegrationTest
     header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("comments");
     header.createCell(header.getLastCellNum(), CellType.STRING).setCellValue("test_enrollment_and_consent_complete");
 
-    // TODO: Fix date fields.
+    // TODO: Fix date fields
     Row data = cacheSheet.createRow(cacheSheet.getLastRowNum() + 1);
     data.createCell(0, CellType.NUMERIC).setCellValue(1);
     data.createCell(data.getLastCellNum(), CellType.STRING).setCellValue("enrollment_arm_1");
