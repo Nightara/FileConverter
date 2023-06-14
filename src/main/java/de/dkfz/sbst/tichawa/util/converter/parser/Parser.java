@@ -9,7 +9,6 @@ import java.util.*;
 
 /**
  * The base interface of the converter library.
- * TODO: Add explanation
  *
  * @param <I> The initial input type for the parser.
  * @param <O> The final output type for the parser.

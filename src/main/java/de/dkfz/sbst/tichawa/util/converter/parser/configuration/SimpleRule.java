@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.*;
 import java.time.format.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.*;
 
@@ -12,6 +13,8 @@ import java.util.regex.*;
 @EqualsAndHashCode(callSuper=true)
 public class SimpleRule<I, O> extends Rule<I, O>
 {
+  private static final LocalDate EXCEL_EPOCH = LocalDate.EPOCH.minus(70, ChronoUnit.YEARS);
+
   final Pattern pattern;
 
   public SimpleRule(String inLabel, String outLabel, DataType<I> inType, DataType<O> outType, Mode mode, I inVal, O outVal)
@@ -44,9 +47,9 @@ public class SimpleRule<I, O> extends Rule<I, O>
               && number.doubleValue() == ((Number) getInVal()).doubleValue());
       case STATIC -> true;
       case SPECIAL -> (getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
-          || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && value instanceof Instant)
+          || (getInType() == DataType.INSTANT && getOutType() == DataType.STRING && canBeUsedAsInstant(value))
           || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && getInVal() != null)
-          || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && value instanceof Instant);
+          || (getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE && canBeUsedAsInstant(value));
       default -> false;
     };
   }
@@ -68,18 +71,34 @@ public class SimpleRule<I, O> extends Rule<I, O>
         };
   }
 
+  private boolean canBeUsedAsInstant(Object value)
+  {
+    return value instanceof Instant
+            || value instanceof LocalDate
+            || value instanceof Double;
+  }
+
   @SuppressWarnings("unchecked")
   private Result<O> applySpecialMode(I value)
   {
+    Instant convertedValue = null;
+    if(value instanceof Double d)
+    {
+      convertedValue = EXCEL_EPOCH.plusDays(d.intValue()).atStartOfDay().toInstant(ZoneOffset.UTC);
+    }
+    else if(value instanceof Instant i)
+    {
+      convertedValue = i;
+    }
+
     if(getOutType() == DataType.INSTANT && getInVal().equals("NOW"))
     {
       return new Result<>(getOutLabel(),this, (O) Instant.now());
     }
     else if(getInType() == DataType.INSTANT && getOutType() == DataType.LOCAL_DATE)
     {
-      return Optional.ofNullable(value)
-          .or(() -> Optional.ofNullable(getInVal()))
-          .map(Instant.class::cast)
+      return Optional.ofNullable(convertedValue)
+          .or(() -> Optional.ofNullable(getInVal()).map(Instant.class::cast))
           .map(val -> val.atZone(ZoneOffset.UTC))
           .map(ZonedDateTime::toLocalDate)
           .map(val -> new Result<>(getOutLabel(),this, (O) val))
@@ -89,10 +108,11 @@ public class SimpleRule<I, O> extends Rule<I, O>
     {
       try
       {
+        assert convertedValue != null;
         return new Result<>(getOutLabel(),this, (O) DateTimeFormatter.ofPattern(getOutVal().toString())
-            .format(((Instant) value).atOffset(ZoneOffset.UTC)));
+            .format(convertedValue.atOffset(ZoneOffset.UTC)));
       }
-      catch(DateTimeParseException ex)
+      catch(NullPointerException | DateTimeParseException ex)
       {
         return null;
       }

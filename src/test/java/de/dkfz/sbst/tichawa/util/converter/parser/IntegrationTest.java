@@ -7,6 +7,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.*;
 import java.util.*;
 import java.util.stream.*;
@@ -154,7 +156,11 @@ class IntegrationTest
 
     Assertions.assertLinesMatch(expectedLabels, actualLabels);
 
-    System.out.println(parser.encodeHeader());
-    System.out.println(parser.encode(results));
+    // TODO: Output is weird, does formatted content work in OpenBIS? If no, replace with raw text somehow.
+    Workbook output = new XSSFWorkbook();
+    Sheet outSheet = output.createSheet();
+    ExcelParser.copyRow(parser.encodeHeader(), outSheet,outSheet.getLastRowNum() + 1);
+    ExcelParser.copyRow(parser.encode(results), outSheet,outSheet.getLastRowNum() + 1);
+    Assertions.assertDoesNotThrow(() -> output.write(Files.newOutputStream(Path.of("test.xlsx"))));
   }
 }

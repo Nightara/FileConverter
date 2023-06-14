@@ -11,7 +11,6 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
-// TODO: Write Unit Tests
 @Value
 @EqualsAndHashCode(callSuper=true)
 public class ExcelParser extends ReactiveParser<Row, Row>
@@ -52,7 +51,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       Rule.Result<Object> value = data.get(label);
       if(value.rule().getOutType().equals(Configuration.DataType.STRING))
       {
-        cell.setCellValue(format((String) value.data()));
+        cell.setCellValue(format(value.data().toString()));
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.BOOLEAN))
       {
@@ -144,5 +143,65 @@ public class ExcelParser extends ReactiveParser<Row, Row>
         .map(ExcelParser::getCellContent)
         .map(Object::toString)
         .toArray(String[]::new);
+  }
+
+  // https://stackoverflow.com/questions/5785724/how-to-insert-a-row-between-two-rows-in-an-existing-excel-with-hssf-apache-poi
+  public static void copyRow(Row source, Sheet target, int targetRow)
+  {
+    // Get the source / new row
+    Row newRow = target.getRow(targetRow);
+
+    // If the row exist in destination, push down all rows by 1 else create a new row
+    if(newRow != null)
+    {
+      target.shiftRows(targetRow, target.getLastRowNum(),1);
+    }
+    else
+    {
+      newRow = target.createRow(targetRow);
+    }
+
+    // Loop through source columns to add to new row
+    for (int i = 0; i < source.getLastCellNum(); i++)
+    {
+      // Grab a copy of the old/new cell
+      Cell oldCell = source.getCell(i);
+      Cell newCell = newRow.createCell(i);
+
+      // If the old cell is null jump to next cell
+      if (oldCell == null)
+      {
+        continue;
+      }
+
+      // Copy style from old cell and apply to new cell
+      CellStyle newCellStyle = target.getWorkbook().createCellStyle();
+      newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
+
+      newCell.setCellStyle(newCellStyle);
+
+      // If there is a cell comment, copy
+      if(oldCell.getCellComment() != null)
+      {
+        newCell.setCellComment(oldCell.getCellComment());
+      }
+
+      // If there is a cell hyperlink, copy
+      if(oldCell.getHyperlink() != null)
+      {
+        newCell.setHyperlink(oldCell.getHyperlink());
+      }
+
+      // Set the cell data value
+      switch(oldCell.getCellType())
+      {
+        case BLANK -> newCell.setCellValue(oldCell.getStringCellValue());
+        case BOOLEAN -> newCell.setCellValue(oldCell.getBooleanCellValue());
+        case ERROR -> newCell.setCellErrorValue(oldCell.getErrorCellValue());
+        case FORMULA -> newCell.setCellFormula(oldCell.getCellFormula());
+        case NUMERIC -> newCell.setCellValue(oldCell.getNumericCellValue());
+        case STRING -> newCell.setCellValue(oldCell.getRichStringCellValue());
+      }
+    }
   }
 }
