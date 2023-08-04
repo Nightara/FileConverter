@@ -47,8 +47,8 @@ class ExcelParserTest
     RULES.add((Rule<Object, Object>) thirdRule);
   }
   private static final Configuration CONFIG = new Configuration(RULES);
-  private static final ExcelParser PARSER = new ExcelParser("Custom",null, CONFIG,
-          "in_one", "in_two");
+  private static final ExcelParser PARSER = new ExcelParser("Custom","CUSTOM_SHEET",null,
+      CONFIG,"in_one", "in_two");
 
   @SuppressWarnings("unused")
   static List<Arguments> generateTestSets()
@@ -65,10 +65,10 @@ class ExcelParserTest
   void testTranslate(Row input, Row expected)
   {
     Row translated = PARSER.translate(input);
-    for(int x = 0; x < ROW_ONE.getLastCellNum(); x++)
+    for(int x = 0; x < input.getLastCellNum(); x++)
     {
       Cell expectedCell = expected.getCell(x);
-      Cell actualCell = translated.getCell(x);
+      Cell actualCell = translated.getCell(x + ExcelParser.DATA_OFFSET);
       if(expectedCell == null)
       {
         Assertions.assertNull(actualCell);
@@ -101,10 +101,11 @@ class ExcelParserTest
     Map<String, Result<Object>> results = PARSER.parse(input);
     Row output = PARSER.encode(results);
 
-    Assertions.assertEquals(CONFIG.getOutLabels().size(), output.getLastCellNum());
-    for(int x = 0; x < output.getLastCellNum(); x++)
+    Assertions.assertEquals(CONFIG.getOutLabels().size() + ExcelParser.DATA_OFFSET, output.getLastCellNum());
+    for(int x = 0; x < CONFIG.getOutLabels().size(); x++)
     {
-      Assertions.assertEquals(results.get(CONFIG.getOutLabels().get(x)).data(), getCellValue(output.getCell(x)));
+      Assertions.assertEquals(results.get(CONFIG.getOutLabels().get(x)).data(),
+          getCellValue(output.getCell(x + ExcelParser.DATA_OFFSET)));
     }
   }
 

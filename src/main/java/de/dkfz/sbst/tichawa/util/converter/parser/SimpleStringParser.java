@@ -91,9 +91,8 @@ public class SimpleStringParser extends ReactiveParser<String, String>
   }
 
   @Override
-  public String encodeHeader(Collection<String> header)
+  public List<String> encodeHeader(Collection<String> header)
   {
-    return header.stream()
-        .collect(Collectors.joining(getOutSeparator()));
+    return List.of(header.stream().collect(Collectors.joining(getOutSeparator())));
   }
 }

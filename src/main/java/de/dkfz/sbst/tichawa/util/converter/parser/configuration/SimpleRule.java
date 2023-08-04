@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.*;
 import java.time.format.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.*;
 
@@ -13,7 +12,7 @@ import java.util.regex.*;
 @EqualsAndHashCode(callSuper=true)
 public class SimpleRule<I, O> extends Rule<I, O>
 {
-  private static final LocalDate EXCEL_EPOCH = LocalDate.EPOCH.minus(70, ChronoUnit.YEARS);
+  private static final LocalDate EXCEL_EPOCH = LocalDate.EPOCH.minusYears(70);
 
   final Pattern pattern;
 

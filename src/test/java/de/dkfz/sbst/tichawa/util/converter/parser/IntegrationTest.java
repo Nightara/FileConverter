@@ -145,7 +145,7 @@ class IntegrationTest
   @MethodSource("generateExcelTestSets")
   void parseExcelData(Configuration config, Row rawData, Row header)
   {
-    ExcelParser parser = new ExcelParser("Custom",null);
+    ExcelParser parser = new ExcelParser("Custom","CUSTOM_OBJECT",null);
     parser.parseHeaderLine(header).ifPresent(inHeaders -> parser.configure(config, inHeaders));
     Map<String, Rule.Result<Object>> results = parser.parse(rawData);
 
@@ -156,10 +156,10 @@ class IntegrationTest
 
     Assertions.assertLinesMatch(expectedLabels, actualLabels);
 
-    // TODO: Output is weird, does formatted content work in OpenBIS? If no, replace with raw text somehow.
     Workbook output = new XSSFWorkbook();
-    Sheet outSheet = output.createSheet();
-    ExcelParser.copyRow(parser.encodeHeader(), outSheet,outSheet.getLastRowNum() + 1);
+    Sheet outSheet = output.createSheet(parser.getSheetName());
+    parser.encodeHeader().forEach(headerRow ->
+        ExcelParser.copyRow(headerRow, outSheet,outSheet.getLastRowNum() + 1));
     ExcelParser.copyRow(parser.encode(results), outSheet,outSheet.getLastRowNum() + 1);
     Assertions.assertDoesNotThrow(() -> output.write(Files.newOutputStream(Path.of("test.xlsx"))));
   }

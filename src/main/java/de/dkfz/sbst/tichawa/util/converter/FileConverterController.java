@@ -337,7 +337,7 @@ public class FileConverterController implements Initializable
   {
     try
     {
-      return Stream.concat(Stream.of(getParser().get().encodeHeader()), Files.lines(path)
+      return Stream.concat(getParser().get().encodeHeader().stream(), Files.lines(path)
           .skip(1)
           .map(getParser().get()::translate))
           .toList();

@@ -8,6 +8,8 @@ import reactor.core.publisher.*;
 
 import java.nio.file.*;
 import java.time.*;
+import java.time.format.*;
+import java.time.temporal.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -15,19 +17,26 @@ import java.util.stream.*;
 @EqualsAndHashCode(callSuper=true)
 public class ExcelParser extends ReactiveParser<Row, Row>
 {
-  @Getter(AccessLevel.PRIVATE)
-  XSSFWorkbook cache = new XSSFWorkbook();
-  @Getter(AccessLevel.PRIVATE)
-  Sheet cacheSheet = getCache().createSheet();
+  public static final Integer DATA_OFFSET = 3;
 
-  public ExcelParser(String name, Path outputPath)
+  String sheetName;
+
+  @Getter(AccessLevel.PRIVATE)
+  Sheet cacheSheet;
+  @Getter(AccessLevel.PRIVATE)
+  XSSFWorkbook cache;
+
+  public ExcelParser(String name, String sheetName, Path outputPath)
   {
-    super(name, outputPath);
+    this(name, sheetName, outputPath,null);
   }
 
-  public ExcelParser(String name, Path outputPath, Configuration config, String... inHeaders)
+  public ExcelParser(String name, String sheetName, Path outputPath, Configuration config, String... inHeaders)
   {
     super(name, outputPath, config, List.of(inHeaders));
+    this.sheetName = sheetName;
+    this.cache = new XSSFWorkbook();
+    this.cacheSheet = getCache().createSheet("Test");
   }
 
   @Override
@@ -47,7 +56,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
     for(int x = 0; x < labels.size(); x++)
     {
       String label = labels.get(x);
-      Cell cell = output.createCell(x);
+      Cell cell = output.createCell(x + DATA_OFFSET);
       Rule.Result<Object> value = data.get(label);
       if(value.rule().getOutType().equals(Configuration.DataType.STRING))
       {
@@ -55,24 +64,21 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.BOOLEAN))
       {
-        cell.setCellValue((Boolean) value.data());
+        cell.setCellValue(value.data().toString());
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.INTEGER)
           || value.rule().getOutType().equals(Configuration.DataType.DOUBLE))
       {
         cell.setCellValue((Double) value.data());
       }
-      else if(value.rule().getOutType().equals(Configuration.DataType.INSTANT))
+      else if(value.rule().getOutType().equals(Configuration.DataType.INSTANT)
+          || value.rule().getOutType().equals(Configuration.DataType.LOCAL_DATE))
       {
-        cell.setCellValue(Date.from((Instant) value.data()));
-      }
-      else if(value.rule().getOutType().equals(Configuration.DataType.LOCAL_DATE))
-      {
-        cell.setCellValue((LocalDate) value.data());
+        cell.setCellValue(DateTimeFormatter.ISO_DATE_TIME.format((TemporalAccessor) value.data()));
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.DURATION))
       {
-        cell.setCellValue(LocalDate.EPOCH.plus((Duration) value.data()));
+        cell.setCellValue(DateTimeFormatter.ISO_DATE_TIME.format(LocalDate.EPOCH.plus((Duration) value.data())));
       }
     }
 
@@ -80,16 +86,25 @@ public class ExcelParser extends ReactiveParser<Row, Row>
   }
 
   @Override
-  public Row encodeHeader(Collection<String> header)
+  public List<Row> encodeHeader(Collection<String> header)
   {
-    Row outHeader = cacheSheet.createRow(0);
+    Row lineOne = cacheSheet.createRow(0);
+    lineOne.createCell(0).setCellValue("SAMPLE");
+    Row lineTwo = cacheSheet.createRow(1);
+    lineTwo.createCell(0).setCellValue("Sample type");
+    Row lineThree = cacheSheet.createRow(2);
+    lineThree.createCell(0).setCellValue(getSheetName());
+    Row lineFour = cacheSheet.createRow(3);
+    lineFour.createCell(0).setCellValue("$");
+    lineFour.createCell(1).setCellValue("Parents");
+    lineFour.createCell(2).setCellValue("Children");
     List<String> labels = getConfig().getOutLabels();
     for(int x = 0; x < labels.size(); x++)
     {
-      outHeader.createCell(x).setCellValue(labels.get(x));
+      lineFour.createCell(x + 3).setCellValue(labels.get(x));
     }
 
-    return outHeader;
+    return List.of(lineOne, lineTwo, lineThree, lineFour);
   }
 
   @Override
@@ -201,6 +216,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
         case FORMULA -> newCell.setCellFormula(oldCell.getCellFormula());
         case NUMERIC -> newCell.setCellValue(oldCell.getNumericCellValue());
         case STRING -> newCell.setCellValue(oldCell.getRichStringCellValue());
+        case _NONE -> {}
       }
     }
   }

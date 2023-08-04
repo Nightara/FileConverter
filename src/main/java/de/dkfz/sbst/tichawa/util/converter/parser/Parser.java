@@ -27,9 +27,9 @@ public interface Parser<I, O>
   ParsedLine parse(int lineNumber, I input);
   O encode(Map<String, Rule.Result<Object>> data);
   List<String> getHeaders();
-  O encodeHeader(Collection<String> header);
+  List<O> encodeHeader(Collection<String> header);
 
-  default O encodeHeader()
+  default List<O> encodeHeader()
   {
     return encodeHeader(getHeaders());
   }
