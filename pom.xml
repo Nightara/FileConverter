@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkfz.sbst.tichawa.util</groupId>
   <artifactId>file-converter</artifactId>
-  <version>3.2.0</version>
+  <version>3.3.0</version>
   <properties>
     <mainClass>de.dkfz.sbst.tichawa.util.converter.Launcher</mainClass>
     <shadeMainClass>de.dkfz.sbst.tichawa.util.converter.ShadeLauncher</shadeMainClass>
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.9.3</version>
+      <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

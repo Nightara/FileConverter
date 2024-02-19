@@ -73,7 +73,7 @@ public abstract class ReactiveParser<I, O> implements Parser<I, O>
   protected void mapInto(String label, Object data, Map<String, Rule.Result<Object>> output, boolean parsed)
   {
     getConfig().rules().stream()
-        .filter(rule -> rule.getInLabel().equals(label))
+        .filter(rule -> rule.getInLabel().equals(label) || rule.getMode() == Rule.Mode.RESOURCE)
         .map(rule -> Tuple.of(rule, parsed ? data : getFirst(tryParsers(data, rule))))
         .filter(tuple -> tuple.t1().canApply(tuple.t2()))
         .map(tuple -> tuple.t1().tryApply(tuple.t2()))

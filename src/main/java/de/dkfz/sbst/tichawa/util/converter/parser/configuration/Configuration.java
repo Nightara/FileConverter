@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-public record Configuration(List<Rule<Object, Object>> rules)
+public record Configuration(List<Rule<Object, Object>> rules, Map<String, Object> resources)
 {
   private static final String EPOCH = "EPOCH";
 
@@ -92,9 +92,15 @@ public record Configuration(List<Rule<Object, Object>> rules)
   public List<String> getOutLabels()
   {
     return rules().stream()
+        .filter(Predicate.not(ResourceRule.class::isInstance))
         .map(Rule::getOutLabel)
         .distinct()
         .toList();
+  }
+
+  public void addResource(String key, Object value)
+  {
+    resources().put(key, value);
   }
 
   public static Optional<Configuration> fromFile(File f)
@@ -133,7 +139,13 @@ public record Configuration(List<Rule<Object, Object>> rules)
             }));
         sumRules.values().forEach(ruleGroup -> ruleGroup.forEach(rule -> rule.setRuleGroup(ruleGroup)));
 
-        return Optional.of(new Configuration(rules));
+        Configuration config = new Configuration(rules, new HashMap<>());
+        config.rules().stream()
+            .filter(ResourceRule.class::isInstance)
+            .map(ResourceRule.class::cast)
+            .forEach(rule -> rule.setConfig(config));
+
+        return Optional.of(config);
       }
       catch(IOException ex)
       {
@@ -203,6 +215,7 @@ public record Configuration(List<Rule<Object, Object>> rules)
         Rule<K, G> rule = switch(mode)
         {
           case SUM -> (Rule<K, G>) new SumRule<>(data[0], data[1], inType, inData);
+          case RESOURCE -> (Rule<K, G>) new ResourceRule<>(data[0], data[1], outType);
           case REGEX, REGEX_TRANSLATE, REGEX_REPLACE, REGEX_MULTI ->
               (Rule<K, G>) new RegexRule<>(data[0], data[1], outType, mode, (String) inData, outData);
           default -> new SimpleRule<>(data[0], data[1], inType, outType, mode, inData, outData);

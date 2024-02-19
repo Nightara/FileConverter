@@ -1,41 +1,44 @@
 package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 
+import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
 import lombok.*;
-import lombok.experimental.Delegate;
-import org.apache.poi.ss.formula.eval.*;
 
-public class ResourceRule<I, O> extends Rule<I, O>
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper=true)
+public class ResourceRule<O> extends Rule<String, O>
 {
-  Rule<I, O> innerRule;
+  private Configuration config;
 
-  public ResourceRule(Rule<I, O> innerRule)
+  public ResourceRule(String inLabel, String outLabel, DataType<O> outType)
   {
-    super(innerRule.getInLabel(), innerRule.getOutLabel(), innerRule.getInType(), innerRule.getOutType(),
-        innerRule.getMode(), innerRule.getInVal(), innerRule.getOutVal());
-    this.innerRule = innerRule;
+    super(inLabel, outLabel, DataType.STRING, outType, Mode.RESOURCE,"",null);
   }
 
   @Override
-  public boolean canApply(I value)
+  public boolean canApply(String value)
   {
-    throw new NotImplementedException("Not implemented yet.");
+    return getConfig() != null
+        && getConfig().resources().containsKey(value)
+        && getOutType().getClazz().isInstance(getConfig().resources().get(value));
   }
 
   @Override
-  public Result<O> apply(I value)
+  @SuppressWarnings("unchecked")
+  public Result<O> apply(String value)
   {
-    throw new NotImplementedException("Not implemented yet.");
+    return new Result<>(getOutLabel(),this, (O) getConfig().resources().get(value));
   }
 
   @Override
   public boolean canReverse(O value)
   {
-    throw new NotImplementedException("Not implemented yet.");
+    return false;
   }
 
   @Override
-  public Result<I> reverse(O value)
+  public Result<String> reverse(O value)
   {
-    throw new NotImplementedException("Not implemented yet.");
+    return null;
   }
 }

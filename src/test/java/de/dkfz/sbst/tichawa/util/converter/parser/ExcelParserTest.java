@@ -46,7 +46,7 @@ class ExcelParserTest
     Rule<?, ?> thirdRule = new SimpleRule<>("in_two","out_one", DataType.INTEGER, DataType.INTEGER, Mode.KEEP,0,0);
     RULES.add((Rule<Object, Object>) thirdRule);
   }
-  private static final Configuration CONFIG = new Configuration(RULES);
+  private static final Configuration CONFIG = new Configuration(RULES, new HashMap<>());
   private static final ExcelParser PARSER = new ExcelParser("Custom","CUSTOM_SHEET",null,
       CONFIG,"in_one", "in_two");
 

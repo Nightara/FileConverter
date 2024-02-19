@@ -20,7 +20,7 @@ class FilterRuleTest
     RULES.add((Rule<Object, Object>) THIRD_RULE);
     RULES.add((Rule<Object, Object>) new FilterRule<>(FIRST_RULE));
   }
-  private static final Configuration CONFIG = new Configuration(RULES);
+  private static final Configuration CONFIG = new Configuration(RULES, new HashMap<>());
   private static final SimpleStringParser PARSER = new SimpleStringParser("Custom",null, CONFIG,
       "\t","\n","in_one", "in_two");
 

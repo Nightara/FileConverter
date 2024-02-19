@@ -47,7 +47,7 @@ public class FilterRule<I, O> extends Rule<I, O>
   @SuppressWarnings("java:S2166")
   public static class FilterException extends ParseException
   {
-    private final Rule<?, ?> rule;
+    private final transient Rule<?, ?> rule;
 
     public FilterException(Rule<?, ?> rule, int lineNumber, Serializable data)
     {

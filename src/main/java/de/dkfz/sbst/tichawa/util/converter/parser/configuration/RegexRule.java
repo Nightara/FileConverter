@@ -14,8 +14,7 @@ public class RegexRule<O> extends Rule<String, O>
 
   private final Pattern pattern;
 
-  public RegexRule(@NonNull String inLabel, @NonNull String outLabel, @NonNull DataType<O> outType, @NonNull Mode mode,
-                   String pattern, O outVal)
+  public RegexRule(String inLabel, String outLabel, DataType<O> outType, Mode mode, String pattern, O outVal)
   {
     super(inLabel, outLabel, DataType.STRING, outType, mode, pattern, outVal);
     this.pattern = Pattern.compile(pattern);
