@@ -61,6 +61,5 @@ class ResourceRuleTest
   {
     rule.setConfig(config);
     Assumptions.assumingThat(canApply, () -> Assertions.assertEquals(output, rule.apply(input).data()));
-    ;
   }
 }

@@ -335,9 +335,9 @@ public class FileConverterController implements Initializable
 
   private List<String> parseLines(Path path)
   {
-    try
+    try(Stream<String> lines = Files.lines(path))
     {
-      return Stream.concat(getParser().get().encodeHeader().stream(), Files.lines(path)
+      return Stream.concat(getParser().get().encodeHeader().stream(), lines
           .skip(1)
           .map(getParser().get()::translate))
           .toList();

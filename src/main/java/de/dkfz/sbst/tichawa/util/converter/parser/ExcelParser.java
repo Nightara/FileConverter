@@ -210,13 +210,11 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       // Set the cell data value
       switch(oldCell.getCellType())
       {
-        case BLANK -> newCell.setCellValue(oldCell.getStringCellValue());
+        case STRING, BLANK, _NONE -> newCell.setCellValue(oldCell.getStringCellValue());
         case BOOLEAN -> newCell.setCellValue(oldCell.getBooleanCellValue());
         case ERROR -> newCell.setCellErrorValue(oldCell.getErrorCellValue());
         case FORMULA -> newCell.setCellFormula(oldCell.getCellFormula());
         case NUMERIC -> newCell.setCellValue(oldCell.getNumericCellValue());
-        case STRING -> newCell.setCellValue(oldCell.getRichStringCellValue());
-        case _NONE -> {}
       }
     }
   }
