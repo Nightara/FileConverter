@@ -1,5 +1,6 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
+import de.dkfz.sbst.tichawa.util.converter.parser.Parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Rule.*;
@@ -46,7 +47,7 @@ class SimpleStringParserTest
   @Test
   void testEncode()
   {
-    Map<String, Result<Object>> results = PARSER.parse("one\t2");
+    ParsedLine results = PARSER.parse("one\t2");
     String[] output = PARSER.encode(results).split(PARSER.getOutSeparator());
 
     Assertions.assertEquals(CONFIG.getOutLabels().size(), output.length);

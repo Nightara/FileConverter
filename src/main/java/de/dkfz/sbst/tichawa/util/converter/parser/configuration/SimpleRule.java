@@ -59,12 +59,23 @@ public class SimpleRule<I, O> extends Rule<I, O>
   {
     return switch(getMode())
         {
-          case KEEP -> new Result<>(getOutLabel(), this, value != null ? (O) value : getOutVal());
+          case KEEP ->
+          {
+            if(value instanceof Integer intVal && getOutType().equals(DataType.DOUBLE))
+            {
+              yield new Result<>(getOutLabel(),this, (O) Double.valueOf(0.0 + intVal));
+            }
+            else if(value instanceof Double doubleVal && getOutType().equals(DataType.INTEGER))
+            {
+              yield new Result<>(getOutLabel(),this, (O) Integer.valueOf(doubleVal.intValue()));
+            }
+            yield new Result<>(getOutLabel(), this, value != null ? (O) value : getOutVal());
+          }
           case TRANSLATE -> getInVal().equals(value)
               || (getInType() == DataType.INTEGER && value instanceof Number number
                   && number.doubleValue() == ((Number) getInVal()).doubleValue())
-              ? new Result<>(getOutLabel(), this, getOutVal()) : null;
-          case STATIC -> new Result<>(getOutLabel(), this, getOutVal());
+              ? new Result<>(getOutLabel(),this, getOutVal()) : null;
+          case STATIC -> new Result<>(getOutLabel(),this, getOutVal());
           case SPECIAL -> applySpecialMode(value);
           default -> null;
         };

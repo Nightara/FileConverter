@@ -79,7 +79,7 @@ public class SimpleStringParser extends ReactiveParser<String, String>
   }
 
   @Override
-  public String encode(Map<String, Rule.Result<Object>> data)
+  public String encode(ParsedLine data)
   {
     return getConfig().getOutLabels().stream()
         .map(data::get)

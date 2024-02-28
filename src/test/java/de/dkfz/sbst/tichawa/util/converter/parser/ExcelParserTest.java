@@ -1,5 +1,6 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
+import de.dkfz.sbst.tichawa.util.converter.parser.Parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Rule.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
@@ -98,23 +99,40 @@ class ExcelParserTest
   @MethodSource("generateTestSets")
   void testEncode(Row input)
   {
-    Map<String, Result<Object>> results = PARSER.parse(input);
+    ParsedLine results = PARSER.parse(input);
     Row output = PARSER.encode(results);
 
     Assertions.assertEquals(CONFIG.getOutLabels().size() + ExcelParser.DATA_OFFSET, output.getLastCellNum());
     for(int x = 0; x < CONFIG.getOutLabels().size(); x++)
     {
-      Assertions.assertEquals(results.get(CONFIG.getOutLabels().get(x)).data(),
-          getCellValue(output.getCell(x + ExcelParser.DATA_OFFSET)));
+      Result<Object> expectedValue = results.get(CONFIG.getOutLabels().get(x));
+      Assertions.assertEquals(expectedValue.data(),
+          getCellValue(output.getCell(x + ExcelParser.DATA_OFFSET),
+              expectedValue.rule().getOutType().equals(DataType.INTEGER)));
     }
   }
 
-  private static Object getCellValue(Cell cell)
+  protected static Object getCellValue(Cell cell)
+  {
+    return getCellValue(cell,false);
+  }
+
+  protected static Object getCellValue(Cell cell, boolean castDoubleToInt)
   {
     return switch(cell.getCellType())
     {
       case _NONE, BLANK -> "";
-      case NUMERIC -> cell.getNumericCellValue();
+      case NUMERIC ->
+      {
+        if(castDoubleToInt)
+        {
+          yield (int) cell.getNumericCellValue();
+        }
+        else
+        {
+          yield cell.getNumericCellValue();
+        }
+      }
       case STRING -> cell.getStringCellValue();
       case BOOLEAN -> cell.getBooleanCellValue();
       case FORMULA -> cell.getCellFormula();

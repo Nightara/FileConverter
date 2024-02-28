@@ -1,5 +1,6 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
+import de.dkfz.sbst.tichawa.util.converter.parser.Parser.*;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -128,7 +129,7 @@ class IntegrationTest
   {
     SimpleStringParser parser = new SimpleStringParser("Custom",null, dataSeparator, rawSeparator);
     parser.parseHeaderLine(rawLabels).ifPresent(inHeaders -> parser.configure(config, inHeaders));
-    Map<String, Rule.Result<Object>> results = parser.parse(rawData);
+    ParsedLine results = parser.parse(rawData);
 
     List<String> expectedLabels = new LinkedList<>(config.getOutLabels());
     Collections.sort(expectedLabels);
@@ -147,7 +148,7 @@ class IntegrationTest
   {
     ExcelParser parser = new ExcelParser("Custom","CUSTOM_OBJECT",null);
     parser.parseHeaderLine(header).ifPresent(inHeaders -> parser.configure(config, inHeaders));
-    Map<String, Rule.Result<Object>> results = parser.parse(rawData);
+    ParsedLine results = parser.parse(rawData);
 
     List<String> expectedLabels = new LinkedList<>(config.getOutLabels());
     Collections.sort(expectedLabels);

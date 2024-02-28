@@ -49,7 +49,7 @@ public class ExcelParser extends ReactiveParser<Row, Row>
   }
 
   @Override
-  public Row encode(Map<String, Rule.Result<Object>> data)
+  public Row encode(ParsedLine data)
   {
     Row output = cacheSheet.createRow(cacheSheet.getLastRowNum() + 1);
     List<String> labels = getConfig().getOutLabels();
@@ -69,7 +69,14 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       else if(value.rule().getOutType().equals(Configuration.DataType.INTEGER)
           || value.rule().getOutType().equals(Configuration.DataType.DOUBLE))
       {
-        cell.setCellValue((Double) value.data());
+        if(value.data() instanceof Double doubleValue)
+        {
+          cell.setCellValue(doubleValue);
+        }
+        else
+        {
+          cell.setCellValue(0.0 + (Integer) value.data());
+        }
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.INSTANT)
           || value.rule().getOutType().equals(Configuration.DataType.LOCAL_DATE))
