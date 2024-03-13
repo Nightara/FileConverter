@@ -1,9 +1,11 @@
 package de.dkfz.sbst.tichawa.util.converter.parser;
 
+import lombok.*;
 import reactor.core.publisher.*;
 
 import java.util.*;
 
+@EqualsAndHashCode(callSuper=true)
 public class CompoundParser<I, O> extends ReactiveParser<I, O>
 {
   private final ReactiveParser<I, ?> inputParser;
