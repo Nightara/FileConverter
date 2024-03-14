@@ -36,6 +36,11 @@ public interface Parser<I, O>
     return encodeHeader(getHeaders());
   }
 
+  default O encodeEmptyLine()
+  {
+    return encode(ParsedLine.EMPTY);
+  }
+
   default ParsedLine parse(I input)
   {
     return parse(0, input);
@@ -54,6 +59,8 @@ public interface Parser<I, O>
   @Value
   class ParsedLine implements Map<String, Rule.Result<Object>>
   {
+    public static final ParsedLine EMPTY = new ParsedLine(-1, Collections.emptyMap());
+
     int lineNumber;
     @Delegate
     @Getter(AccessLevel.NONE)
