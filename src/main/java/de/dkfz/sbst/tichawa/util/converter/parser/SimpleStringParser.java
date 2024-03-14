@@ -95,4 +95,16 @@ public class SimpleStringParser extends ReactiveParser<String, String>
   {
     return List.of(header.stream().collect(Collectors.joining(getOutSeparator())));
   }
+
+  @Override
+  public boolean isOutputEmpty(String output)
+  {
+    return output == null || output.isBlank();
+  }
+
+  @Override
+  public boolean isInputEmpty(String input)
+  {
+    return isOutputEmpty(input);
+  }
 }

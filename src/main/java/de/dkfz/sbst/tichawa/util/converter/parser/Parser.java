@@ -28,6 +28,8 @@ public interface Parser<I, O>
   O encode(ParsedLine data);
   List<String> getHeaders();
   List<O> encodeHeader(Collection<String> header);
+  boolean isOutputEmpty(O output);
+  boolean isInputEmpty(I input);
 
   default List<O> encodeHeader()
   {

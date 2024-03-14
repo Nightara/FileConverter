@@ -225,4 +225,19 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       }
     }
   }
+
+  @Override
+  public boolean isOutputEmpty(Row output)
+  {
+    return output == null || output.getPhysicalNumberOfCells() == 0
+        || StreamSupport.stream(output.spliterator(),false)
+        .map(Cell::getCellType)
+        .allMatch(CellType.BLANK::equals);
+  }
+
+  @Override
+  public boolean isInputEmpty(Row input)
+  {
+    return isOutputEmpty(input);
+  }
 }

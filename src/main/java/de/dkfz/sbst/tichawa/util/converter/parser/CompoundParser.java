@@ -42,4 +42,16 @@ public class CompoundParser<I, O> extends ReactiveParser<I, O>
   {
     return inputParser.parseReactive(lineNumber, input);
   }
+
+  @Override
+  public boolean isOutputEmpty(O output)
+  {
+    return outputParser.isOutputEmpty(output);
+  }
+
+  @Override
+  public boolean isInputEmpty(I input)
+  {
+    return inputParser.isInputEmpty(input);
+  }
 }
