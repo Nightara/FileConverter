@@ -127,23 +127,23 @@ public class ExcelParser extends ReactiveParser<Row, Row>
           Optional<Rule<Object, Object>> filterStatus = getFilterStatus(getInHeaders().get(x), getCellContent(input.getCell(x)),true);
           if(filterStatus.isPresent())
           {
-            return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, serialize(input)));
+            return Mono.error(new FilterRule.FilterException(filterStatus.get(), lineNumber, input));
           }
 
           mapInto(getInHeaders().get(x), getCellContent(input.getCell(x)), output,true);
         }
 
-        return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, serialize(input))) : Mono.just(new ParsedLine(lineNumber, output));
+        return output.isEmpty() ? Mono.error(new ParseException("Empty output data", lineNumber, input)) : Mono.just(new ParsedLine(lineNumber, output));
       }
       else
       {
         return Mono.error(new ParseException("Input data shorter than expected. Expected "
-            + getInHeaders().size() + " elements, but found " + (input.getLastCellNum() + 1), lineNumber, serialize(input)));
+            + getInHeaders().size() + " elements, but found " + (input.getLastCellNum() + 1), lineNumber, input));
       }
     }
     else
     {
-      return Mono.error(new ParseException("Parser is not ready.", lineNumber, serialize(input)));
+      return Mono.error(new ParseException("Parser is not ready.", lineNumber, input));
     }
   }
 
@@ -157,14 +157,6 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       case STRING -> cell.getStringCellValue();
       case FORMULA -> cell.getCellFormula();
     };
-  }
-
-  private static String[] serialize(Row input)
-  {
-    return StreamSupport.stream(input.spliterator(),false)
-        .map(ExcelParser::getCellContent)
-        .map(Object::toString)
-        .toArray(String[]::new);
   }
 
   // https://stackoverflow.com/questions/5785724/how-to-insert-a-row-between-two-rows-in-an-existing-excel-with-hssf-apache-poi

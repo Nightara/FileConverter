@@ -3,8 +3,6 @@ package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 import de.dkfz.sbst.tichawa.util.converter.parser.*;
 import lombok.*;
 
-import java.io.*;
-
 @Value
 @EqualsAndHashCode(callSuper=true)
 public class FilterRule<I, O> extends Rule<I, O>
@@ -44,12 +42,12 @@ public class FilterRule<I, O> extends Rule<I, O>
 
   @Getter
   @EqualsAndHashCode(callSuper=true)
-  @SuppressWarnings("java:S2166")
+  @SuppressWarnings({"java:S2166", "java:S110"})
   public static class FilterException extends ParseException
   {
     private final transient Rule<?, ?> rule;
 
-    public FilterException(Rule<?, ?> rule, int lineNumber, Serializable data)
+    public FilterException(Rule<?, ?> rule, int lineNumber, Object data)
     {
       super("FilterRule " + rule + " applied.", lineNumber, data);
       this.rule = rule;
