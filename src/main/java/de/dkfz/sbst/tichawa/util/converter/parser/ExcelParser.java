@@ -194,12 +194,6 @@ public class ExcelParser extends ReactiveParser<Row, Row>
         continue;
       }
 
-      // Copy style from old cell and apply to new cell
-      CellStyle newCellStyle = target.getWorkbook().createCellStyle();
-      newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
-
-      newCell.setCellStyle(newCellStyle);
-
       // If there is a cell comment, copy
       if(oldCell.getCellComment() != null)
       {
