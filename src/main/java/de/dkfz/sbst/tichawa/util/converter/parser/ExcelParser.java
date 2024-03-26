@@ -85,12 +85,12 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       else if(value.rule().getOutType().equals(Configuration.DataType.INSTANT)
           || value.rule().getOutType().equals(Configuration.DataType.LOCAL_DATE))
       {
-        cell.setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(Locale.ENGLISH)
+        cell.setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(Locale.ENGLISH).withZone(ZoneOffset.UTC)
             .format((TemporalAccessor) value.data()));
       }
       else if(value.rule().getOutType().equals(Configuration.DataType.DURATION))
       {
-        cell.setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(Locale.ENGLISH)
+        cell.setCellValue(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(Locale.ENGLISH).withZone(ZoneOffset.UTC)
             .format(LocalDate.EPOCH.plus((Duration) value.data())));
       }
     }
