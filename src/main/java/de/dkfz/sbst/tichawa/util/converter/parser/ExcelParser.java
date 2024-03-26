@@ -58,7 +58,11 @@ public class ExcelParser extends ReactiveParser<Row, Row>
       String label = labels.get(x);
       Cell cell = output.createCell(x + DATA_OFFSET);
       Rule.Result<Object> value = data.get(label);
-      if(value.rule().getOutType().equals(Configuration.DataType.STRING))
+      if(value == null)
+      {
+        cell.setBlank();
+      }
+      else if(value.rule().getOutType().equals(Configuration.DataType.STRING))
       {
         cell.setCellValue(format(value.data().toString()));
       }
