@@ -65,5 +65,34 @@ public interface Parser<I, O>
     @Delegate
     @Getter(AccessLevel.NONE)
     Map<String, Rule.Result<Object>> innerMap;
+
+    public ParsedLine withPrefix(String prefix)
+    {
+      ParsedLine newParsedLine = new ParsedLine(lineNumber, new HashMap<>());
+      this.forEach((key, entry) -> newParsedLine.put(prefix + key, entry));
+
+      return newParsedLine;
+    }
+
+    public ParsedLine withoutPrefix(String prefix)
+    {
+      ParsedLine newParsedLine = new ParsedLine(lineNumber, new HashMap<>());
+      this.forEach((key, entry) -> newParsedLine.put(key.startsWith(prefix) ? key.substring(prefix.length()) : key,
+          entry));
+
+      return newParsedLine;
+    }
+
+    public static ParsedLine merge(ParsedLine a, ParsedLine b)
+    {
+      if(a.lineNumber != b.lineNumber || !Collections.disjoint(a.keySet(), b.keySet()))
+      {
+        throw new IllegalArgumentException("The ParsedLines must have the same line number and must be disjoint");
+      }
+      HashMap<String, Rule.Result<Object>> newMap = new HashMap<>(a);
+      newMap.putAll(b);
+
+      return new ParsedLine(a.lineNumber, newMap);
+    }
   }
 }
