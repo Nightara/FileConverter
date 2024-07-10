@@ -95,4 +95,9 @@ public class MultiParser<I, O> extends ReactiveParser<I, List<O>>
   {
     return innerParsers.stream().allMatch(parser -> parser.isInputEmpty(input));
   }
+
+  public List<ReactiveParser<I, O>> getInnerParsers()
+  {
+    return List.copyOf(innerParsers);
+  }
 }
