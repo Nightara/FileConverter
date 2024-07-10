@@ -34,7 +34,7 @@ public class SumRule<I> extends SimpleRule<I, I>
   @Override
   public boolean canApply(I value)
   {
-    return value == null || value instanceof Number || value instanceof Temporal;
+    return value == null || value instanceof Number || value instanceof Temporal || value instanceof String;
   }
 
   @Override
@@ -82,6 +82,14 @@ public class SumRule<I> extends SimpleRule<I, I>
             .map(Temporal.class::cast)
             .map(temporal -> Duration.between(Instant.EPOCH, temporal))
             .reduce(Duration.ZERO, Duration::plus)));
+      }
+      else if(value instanceof String)
+      {
+        String stringDefaultVal = (String) getDefaultVal();
+        result = new Result<>(getOutLabel(),this, (I) getRuleGroup().stream()
+            .map(SumRule::getStash)
+            .map(String.class::cast)
+            .reduce(stringDefaultVal, String::concat));
       }
 
       getRuleGroup().forEach(SumRule::clearStash);
