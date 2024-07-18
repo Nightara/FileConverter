@@ -5,6 +5,13 @@ import reactor.core.publisher.*;
 
 import java.util.*;
 
+/**
+ * A Parser implementation that capable of conversion from any input type to any output type by delegating its methods
+ * to an internal input and output sub parser.
+ *
+ * @param <I> The input type
+ * @param <O> The output type
+ */
 @EqualsAndHashCode(callSuper=true)
 public class CompoundParser<I, O> extends ReactiveParser<I, O>
 {

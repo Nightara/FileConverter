@@ -7,6 +7,13 @@ import reactor.core.publisher.*;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+ * A Parser implementation capable of generating multiple output from a single input file by deleting its methods to
+ * a list of sub parsers, and creating a distinct output for each of them.
+ *
+ * @param <I> The input type
+ * @param <O> The output type
+ */
 @EqualsAndHashCode(callSuper=true)
 public class MultiParser<I, O> extends ReactiveParser<I, List<O>>
 {

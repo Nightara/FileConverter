@@ -13,6 +13,9 @@ import java.time.temporal.*;
 import java.util.*;
 import java.util.stream.*;
 
+/**
+ * A Parser implementation to handle Excel files.
+ */
 @Value
 @EqualsAndHashCode(callSuper=true)
 public class ExcelParser extends ReactiveParser<Row, Row>

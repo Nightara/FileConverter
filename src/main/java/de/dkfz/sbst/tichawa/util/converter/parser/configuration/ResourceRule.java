@@ -3,6 +3,13 @@ package de.dkfz.sbst.tichawa.util.converter.parser.configuration;
 import de.dkfz.sbst.tichawa.util.converter.parser.configuration.Configuration.*;
 import lombok.*;
 
+/**
+ * ResourceRule is a Rule implementation to represent a data repository.
+ * A ResourceRule is directly tied to a Config, and simply returns the Config's resource value stored at the key defined
+ * as this rule's inVal.
+ *
+ * @param <O> The output type
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)

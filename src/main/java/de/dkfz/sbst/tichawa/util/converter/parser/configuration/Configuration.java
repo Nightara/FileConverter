@@ -9,6 +9,13 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+/**
+ * A parser configuration containing all conversion rules the parser should adhere to, including instructions on how to
+ * parse input into the formats required by the rules.
+ *
+ * @param rules The parser rules
+ * @param resources The additional resource map (Currently not used)
+ */
 public record Configuration(List<Rule<Object, Object>> rules, Map<String, Object> resources)
 {
   private static final String EPOCH = "EPOCH";

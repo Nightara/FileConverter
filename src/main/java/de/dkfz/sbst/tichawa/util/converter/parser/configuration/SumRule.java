@@ -6,6 +6,16 @@ import java.time.*;
 import java.time.temporal.*;
 import java.util.*;
 
+/**
+ * A rule summing up several values.
+ * A SumRule always expects all values in its group to be filled before the value can be retrieved, at which point all
+ * SumRules in the group are reset and can be filled again.
+ * Attempting to retrieve a value of a SumRule before all SumRules in its group are filled will always return null.
+ *
+ * Currently, SumRule supports Integer, Double, Temporal, and String.
+ *
+ * @param <I> The rule data type.
+ */
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper=true)

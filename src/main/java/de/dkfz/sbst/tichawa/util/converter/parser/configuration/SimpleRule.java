@@ -8,6 +8,22 @@ import java.time.format.*;
 import java.util.*;
 import java.util.regex.*;
 
+/**
+ * A basic implementation of Rule capable of handling the following modes:
+ *  - Static
+ *  - Keep
+ *  - Translate
+ *  - Special
+ *  Currently, Special covers the following scenarios:
+ *  - Input type Instant, output type String. The output value is interpreted as a format string, and the result will be
+ *  the output of Instant.format(outVal).
+ *  - Input type Instant, inVal "NOW". The input value will be replaced with Instant.now().
+ *  - Input type Instant, output type Local Date.
+ * Keep and Translate are reversible, any other mode is not reversible.
+ *
+ * @param <I> The input data type
+ * @param <O> The output data type
+ */
 @Getter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper=true)
 public class SimpleRule<I, O> extends Rule<I, O>

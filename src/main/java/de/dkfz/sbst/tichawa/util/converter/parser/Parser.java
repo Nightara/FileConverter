@@ -10,8 +10,8 @@ import java.util.*;
 /**
  * The base interface of the converter library.
  *
- * @param <I> The initial input type for the parser.
- * @param <O> The final output type for the parser.
+ * @param <I> The initial input type for the parser
+ * @param <O> The final output type for the parser
  */
 @SuppressWarnings("unused")
 public interface Parser<I, O>
@@ -56,6 +56,9 @@ public interface Parser<I, O>
     return getOutputPath() != null;
   }
 
+  /**
+   * The intermediate data format used by all parsers.
+   */
   @Value
   class ParsedLine implements Map<String, Rule.Result<Object>>
   {
@@ -66,6 +69,12 @@ public interface Parser<I, O>
     @Getter(AccessLevel.NONE)
     Map<String, Rule.Result<Object>> innerMap;
 
+    /**
+     * Create a copy of this ParsedLine, prefixing all attributes with the given string prefix.
+     *
+     * @param prefix The prefix to prepend
+     * @return The prefixed copy
+     */
     public ParsedLine withPrefix(String prefix)
     {
       ParsedLine newParsedLine = new ParsedLine(lineNumber, new HashMap<>());
@@ -74,6 +83,13 @@ public interface Parser<I, O>
       return newParsedLine;
     }
 
+    /**
+     * Create a copy of this ParsedLine, removing the given string prefix from all attributes.
+     * Attributes without the prefix remain unchanged.
+     *
+     * @param prefix The prefix to remove
+     * @return The copy with prefixes
+     */
     public ParsedLine withoutPrefix(String prefix)
     {
       ParsedLine newParsedLine = new ParsedLine(lineNumber, new HashMap<>());
@@ -83,6 +99,17 @@ public interface Parser<I, O>
       return newParsedLine;
     }
 
+    /**
+     * Create a merged copy of two ParsedLines, adding all attributes from both provided ParsedLines.
+     * This method only works for ParsedLines sharing the same line number to avoid unintended merges, and only allows
+     * merging of fully ParsedLines with fully disjointed attributes.
+     *
+     * @param a The first ParsedLine
+     * @param b The second ParsedLine
+     * @return The merged copy
+     * @throws IllegalArgumentException If the two lines do not share the same line number or contain an overlap in
+     * attributes
+     */
     public static ParsedLine merge(ParsedLine a, ParsedLine b)
     {
       if(a.lineNumber != b.lineNumber || !Collections.disjoint(a.keySet(), b.keySet()))

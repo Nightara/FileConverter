@@ -10,6 +10,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
 import java.util.stream.*;
 
+/**
+ * An extension of the generic Parser class to enable easier handling of data fluxes instead of single lines of data.
+ *
+ * @param <I> The input type
+ * @param <O> The output type
+ */
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor

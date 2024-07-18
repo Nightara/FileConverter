@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.*;
 
+/**
+ * A Parser implementation to handle CSV, TSV, and similar text-based formats.
+ */
 @Getter
 @EqualsAndHashCode(callSuper=true)
 public class SimpleStringParser extends ReactiveParser<String, String>

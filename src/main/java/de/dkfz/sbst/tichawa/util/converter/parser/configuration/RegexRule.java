@@ -5,6 +5,18 @@ import lombok.*;
 
 import java.util.regex.*;
 
+/**
+ * A RegexRule represents a rule matching a regular expression given as inVal to the value it is applied to, and then
+ * proceeds differently based on its mode:
+ * - Regex tries to match the regular expression to the provided value, and then returns the group identified by the
+ * number provided in outVal.
+ * - RegexMulti works like Regex, but takes a slash-separated list of group numbers, and returns a concatenation of the
+ * specified groups.
+ * - RegexReplace replaces all matches of the supplied regular expression with the value provided in outVal.
+ * - RegexTranslate works like Translate, but applies to any values matching the given regular expression.
+ *
+ * @param <O> The output type
+ */
 @Getter(AccessLevel.PRIVATE)
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper=true)
