@@ -158,6 +158,11 @@ public class ExcelParser extends ReactiveParser<Row, Row>
 
   private static Object getCellContent(Cell cell)
   {
+    if(cell == null)
+    {
+      return "";
+    }
+
     return switch(cell.getCellType())
     {
       case _NONE, BLANK, ERROR -> "";
