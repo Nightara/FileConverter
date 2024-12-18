@@ -56,7 +56,7 @@ public class RegexRule<O> extends Rule<String, O>
           }
           catch(NumberFormatException ex)
           {
-            yield new Result<>(getOutLabel(), this, (O) m.group(getOutVal().toString()));
+            yield new Result<>(getOutLabel(), this, (O) getOutVal().toString());
           }
           catch(IndexOutOfBoundsException | IllegalArgumentException ex)
           {
@@ -75,7 +75,7 @@ public class RegexRule<O> extends Rule<String, O>
             }
             catch(NumberFormatException ex)
             {
-              result.append(m.group(group));
+              result.append(group);
             }
             catch(IndexOutOfBoundsException | IllegalArgumentException ex)
             {
