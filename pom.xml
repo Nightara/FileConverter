@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkfz.sbst.tichawa.util</groupId>
   <artifactId>file-converter</artifactId>
-  <version>3.9.0</version>
+  <version>4.0.1</version>
   <properties>
     <mainClass>de.dkfz.sbst.tichawa.util.converter.Launcher</mainClass>
     <shadeMainClass>de.dkfz.sbst.tichawa.util.converter.ShadeLauncher</shadeMainClass>
@@ -131,6 +131,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
       <version>1.26.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.11.0</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
