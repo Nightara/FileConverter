@@ -7,9 +7,8 @@ import java.nio.file.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
-import java.util.stream.*;
 
-public class JsonParser extends ReactiveParser<String, String>
+public class JsonParser extends ReactiveParser<JsonObject, JsonObject>
 {
   private final Gson gson;
 
@@ -24,17 +23,15 @@ public class JsonParser extends ReactiveParser<String, String>
     this.gson = new GsonBuilder().create();
   }
 
-  //TODO: Test
   @Override
-  public Mono<ParsedLine> parseReactive(int lineNumber, String input)
+  public Mono<ParsedLine> parseReactive(int lineNumber, JsonObject input)
   {
     if(isReady())
     {
       try
       {
         Map<String, Rule.Result<Object>> output = new HashMap<>();
-        JsonObject json = gson.fromJson(input, JsonObject.class);
-        for(Map.Entry<String, JsonElement> entry : json.entrySet())
+        for(Map.Entry<String, JsonElement> entry : input.entrySet())
         {
           Optional<Rule<Object, Object>> filterStatus = getFilterStatus(entry.getKey(), getFieldValue(entry.getValue()),true);
           if(filterStatus.isPresent())
@@ -59,12 +56,11 @@ public class JsonParser extends ReactiveParser<String, String>
   }
 
   @Override
-  public Optional<String[]> parseHeaderLine(String input)
+  public Optional<String[]> parseHeaderLine(JsonObject input)
   {
     try
     {
-      JsonObject parsed = gson.fromJson(input, JsonObject.class);
-      return Optional.of(parsed.keySet().toArray(String[]::new));
+      return Optional.of(input.keySet().toArray(String[]::new));
     }
     catch(JsonSyntaxException ex)
     {
@@ -73,44 +69,30 @@ public class JsonParser extends ReactiveParser<String, String>
   }
 
   @Override
-  public String encode(ParsedLine data)
+  public JsonObject encode(ParsedLine data)
   {
-    return gson.toJson(data.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey,entry -> entry.getValue().data())));
+    JsonObject output = new JsonObject();
+    data.forEach((key,value) -> output.add(key, gson.toJsonTree(value.data())));
+
+    return output;
   }
 
   @Override
-  public List<String> encodeHeader(Collection<String> header)
+  public List<JsonObject> encodeHeader(Collection<String> header)
   {
     return List.of();
   }
 
   @Override
-  public boolean isOutputEmpty(String output)
+  public boolean isOutputEmpty(JsonObject output)
   {
-    try
-    {
-      JsonObject parsed = gson.fromJson(output, JsonObject.class);
-      return parsed.isEmpty();
-    }
-    catch(JsonSyntaxException ex)
-    {
-      return true;
-    }
+    return output.isEmpty();
   }
 
   @Override
-  public boolean isInputEmpty(String input)
+  public boolean isInputEmpty(JsonObject input)
   {
-    try
-    {
-      JsonObject parsed = gson.fromJson(input, JsonObject.class);
-      return parsed.isEmpty();
-    }
-    catch(JsonSyntaxException ex)
-    {
-      return true;
-    }
+    return input.isEmpty();
   }
 
   private static Object getFieldValue(JsonElement jsonElement)

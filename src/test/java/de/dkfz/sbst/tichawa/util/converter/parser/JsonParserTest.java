@@ -12,6 +12,11 @@ import java.util.*;
 class JsonParserTest
 {
   private static final Gson GSON = new GsonBuilder().create();
+  private static final JsonObject INPUT_ONE = GSON.fromJson("{\"in_one\":\"one\",\"in_two\":2}", JsonObject.class);
+  private static final JsonObject INPUT_TWO = GSON.fromJson("{\"in_one\":\"two\",\"in_two\":0}", JsonObject.class);
+  private static final JsonObject OUTPUT_ONE = GSON.fromJson("{\"out_two\":\"three\",\"out_one\":2}", JsonObject.class);
+  private static final JsonObject OUTPUT_TWO = GSON.fromJson("{\"out_two\":\"one\",\"out_one\":0}", JsonObject.class);
+
   private static final List<Rule<Object, Object>> RULES = new LinkedList<>();
   static
   {
@@ -29,14 +34,14 @@ class JsonParserTest
   @Test
   void testTranslate()
   {
-    Assertions.assertEquals("{\"out_two\":\"three\",\"out_one\":2}", PARSER.translate("{\"in_one\":\"one\",\"in_two\":2}"));
-    Assertions.assertEquals("{\"out_two\":\"one\",\"out_one\":0}", PARSER.translate("{\"in_one\":\"two\",\"in_two\":0}"));
+    Assertions.assertEquals(OUTPUT_ONE, PARSER.translate(INPUT_ONE));
+    Assertions.assertEquals(OUTPUT_TWO, PARSER.translate(INPUT_TWO));
   }
 
   @Test
   void testParse()
   {
-    Map<String, Rule.Result<Object>> results = PARSER.parse("{\"in_one\":\"one\",\"in_two\":2}");
+    Map<String, Rule.Result<Object>> results = PARSER.parse(INPUT_ONE);
 
     Assertions.assertEquals(2, results.size());
     Assertions.assertTrue(results.containsKey("out_one"));
@@ -48,7 +53,7 @@ class JsonParserTest
   @Test
   void testEncode()
   {
-    Parser.ParsedLine results = PARSER.parse("{\"in_one\":\"one\",\"in_two\":2}");
+    Parser.ParsedLine results = PARSER.parse(INPUT_ONE);
     JsonObject output = GSON.fromJson(PARSER.encode(results), JsonObject.class);
 
     Assertions.assertEquals(CONFIG.getOutLabels().size(), output.size());
